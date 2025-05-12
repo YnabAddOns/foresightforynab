@@ -1,0 +1,30 @@
+name: Deploy
+
+on:
+  release:
+    types: [published]
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        required: false
+    secrets:
+      TRIGGER_URL:
+        required: true
+
+env:
+  TRIGGER_URL: ${{ secrets.TRIGGER_URL }}
+
+jobs:
+  deploy:
+    environment: main
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy
+        run:
+          curl -X POST "${TRIGGER_URL}"
+        shell: bash
+        env:
+          TRIGGER_URL: ${{ secrets.TRIGGER_URL }}

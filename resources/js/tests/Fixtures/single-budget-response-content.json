@@ -1,0 +1,221 @@
+{
+    "data": {
+        "budget": {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "name": "string",
+            "last_modified_on": "2025-05-13T19:46:59.834Z",
+            "first_month": "2025-05-13",
+            "last_month": "2025-05-13",
+            "date_format": {
+                "format": "string"
+            },
+            "currency_format": {
+                "iso_code": "string",
+                "example_format": "string",
+                "decimal_digits": 0,
+                "decimal_separator": "string",
+                "symbol_first": true,
+                "group_separator": "string",
+                "currency_symbol": "string",
+                "display_symbol": true
+            },
+            "accounts": [
+                {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "name": "string",
+                    "type": "checking",
+                    "on_budget": true,
+                    "closed": true,
+                    "note": "string",
+                    "balance": 0,
+                    "cleared_balance": 0,
+                    "uncleared_balance": 0,
+                    "transfer_payee_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "direct_import_linked": true,
+                    "direct_import_in_error": true,
+                    "last_reconciled_at": "2025-05-13T19:46:59.834Z",
+                    "debt_original_balance": 0,
+                    "debt_interest_rates": {
+                        "additionalProp1": 0,
+                        "additionalProp2": 0,
+                        "additionalProp3": 0
+                    },
+                    "debt_minimum_payments": {
+                        "additionalProp1": 0,
+                        "additionalProp2": 0,
+                        "additionalProp3": 0
+                    },
+                    "debt_escrow_amounts": {
+                        "additionalProp1": 0,
+                        "additionalProp2": 0,
+                        "additionalProp3": 0
+                    },
+                    "deleted": false
+                }
+            ],
+            "payees": [
+                {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "name": "string",
+                    "transfer_account_id": "string",
+                    "deleted": false
+                }
+            ],
+            "payee_locations": [
+                {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "payee_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "latitude": "string",
+                    "longitude": "string",
+                    "deleted": false
+                }
+            ],
+            "category_groups": [
+                {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "name": "string",
+                    "hidden": true,
+                    "deleted": false
+                }
+            ],
+            "categories": [
+                {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "category_group_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "category_group_name": "string",
+                    "name": "string",
+                    "hidden": true,
+                    "original_category_group_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "note": "string",
+                    "budgeted": 0,
+                    "activity": 0,
+                    "balance": 0,
+                    "goal_type": "TB",
+                    "goal_needs_whole_amount": null,
+                    "goal_day": 0,
+                    "goal_cadence": 0,
+                    "goal_cadence_frequency": 0,
+                    "goal_creation_month": "2025-05-13",
+                    "goal_target": 0,
+                    "goal_target_month": "2025-05-13",
+                    "goal_percentage_complete": 0,
+                    "goal_months_to_budget": 0,
+                    "goal_under_funded": 0,
+                    "goal_overall_funded": 0,
+                    "goal_overall_left": 0,
+                    "deleted": false
+                }
+            ],
+            "months": [
+                {
+                    "month": "2025-05-13",
+                    "note": "string",
+                    "income": 0,
+                    "budgeted": 0,
+                    "activity": 0,
+                    "to_be_budgeted": 0,
+                    "age_of_money": 0,
+                    "deleted": false,
+                    "categories": [
+                        {
+                            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                            "category_group_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                            "category_group_name": "string",
+                            "name": "string",
+                            "hidden": true,
+                            "original_category_group_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                            "note": "string",
+                            "budgeted": 0,
+                            "activity": 0,
+                            "balance": 0,
+                            "goal_type": "TB",
+                            "goal_needs_whole_amount": null,
+                            "goal_day": 0,
+                            "goal_cadence": 0,
+                            "goal_cadence_frequency": 0,
+                            "goal_creation_month": "2025-05-13",
+                            "goal_target": 0,
+                            "goal_target_month": "2025-05-13",
+                            "goal_percentage_complete": 0,
+                            "goal_months_to_budget": 0,
+                            "goal_under_funded": 0,
+                            "goal_overall_funded": 0,
+                            "goal_overall_left": 0,
+                            "deleted": false
+                        }
+                    ]
+                }
+            ],
+            "transactions": [
+                {
+                    "id": "string",
+                    "date": "2025-05-13",
+                    "amount": 0,
+                    "memo": "string",
+                    "cleared": "cleared",
+                    "approved": true,
+                    "flag_color": "red",
+                    "flag_name": "string",
+                    "account_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "payee_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "category_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "transfer_account_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "transfer_transaction_id": "string",
+                    "matched_transaction_id": "string",
+                    "import_id": "string",
+                    "import_payee_name": "string",
+                    "import_payee_name_original": "string",
+                    "debt_transaction_type": "payment",
+                    "deleted": false
+                }
+            ],
+            "subtransactions": [
+                {
+                    "id": "string",
+                    "transaction_id": "string",
+                    "amount": 0,
+                    "memo": "string",
+                    "payee_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "payee_name": "string",
+                    "category_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "category_name": "string",
+                    "transfer_account_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "transfer_transaction_id": "string",
+                    "deleted": false
+                }
+            ],
+            "scheduled_transactions": [
+                {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "date_first": "2025-05-13",
+                    "date_next": "2025-05-13",
+                    "frequency": "never",
+                    "amount": 0,
+                    "memo": "string",
+                    "flag_color": "red",
+                    "flag_name": "string",
+                    "account_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "payee_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "category_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "transfer_account_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "deleted": false
+                }
+            ],
+            "scheduled_subtransactions": [
+                {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "scheduled_transaction_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "amount": 0,
+                    "memo": "string",
+                    "payee_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "payee_name": "string",
+                    "category_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "category_name": "string",
+                    "transfer_account_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "deleted": false
+                }
+            ]
+        },
+        "server_knowledge": 0
+    }
+}
