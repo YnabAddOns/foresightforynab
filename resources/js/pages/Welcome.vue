@@ -862,6 +862,10 @@ function exportCsv() {
 }
 
 const consented = computed(() => props.cookieConsent);
+
+function refresh() {
+    window.location.reload();
+}
 </script>
 
 <template>
@@ -1181,5 +1185,8 @@ const consented = computed(() => props.cookieConsent);
         </div>
         <div v-else>This browser does not support the current storage scheme. Please switch to a browser that does.</div>
     </div>
-    <div class="text-center" v-else>Must consent to the above cookie policy to use the app.</div>
+    <div class="text-center" v-else>
+        <p>Must consent to the above cookie policy to use the app.</p>
+        <p><button class="cursor-pointer text-blue-500 hover:underline" @click="refresh">Refresh the page.</button></p>
+    </div>
 </template>
