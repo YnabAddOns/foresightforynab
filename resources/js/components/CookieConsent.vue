@@ -31,7 +31,7 @@ function close() {
                         <p class="text-body-color dark:text-dark-6 text-base">
                             We use cookies and local storage to ensure the site functions. Clicking "Accept" means you agree to the current data
                             storage standards as outlined in the
-                            <a class="text-blue-500 hover:underline" :href="route('privacy')" target="_blank">Privacy Policy</a>.
+                            <a class="text-blue-500 hover:underline" :href="route('privacy')">Privacy Policy</a>.
                         </p>
                     </div>
                 </div>
