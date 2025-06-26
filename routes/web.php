@@ -24,7 +24,7 @@ Route::get('/', static function (Request $request) {
 })->name('home');
 
 Route::get('/repeating', static function (Request $request) {
-    $noCookieConsent = ! $request->cookie('cookieConsent');
+    $noCookieConsent = ! Cookie::get('cookie_consent');
 
     if ($noCookieConsent) {
         return to_route('home');
