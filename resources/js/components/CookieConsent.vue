@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { cookie } from '@/composables/useStorage.js';
 
-const consented = ref(cookie.getConsent() ?? false);
+const props = defineProps({
+    cookieConsent: Boolean,
+});
+
+const consented = ref(props.cookieConsent ?? false);
 
 const notConsented = computed(() => !consented.value);
 
 function accept() {
     consented.value = true;
-    cookie.storeConsent(true);
+
+    window.location.href = route('home', { cookie_consent: true });
 }
 
 function close() {
     consented.value = true;
-    cookie.storeConsent(false);
 }
 </script>
 
@@ -25,19 +28,23 @@ function close() {
             >
                 <div class="w-full md:w-7/12 lg:w-2/3">
                     <div class="mb-6 md:mb-0">
-                        <p class="text-body-color dark:text-dark-6 text-base">We use cookies and local storage to ensure the site functions. Learn more <a class="text-blue-500 hover:underline" :href="route('privacy')" target="_blank">here</a>.</p>
+                        <p class="text-body-color dark:text-dark-6 text-base">
+                            We use cookies and local storage to ensure the site functions. Clicking "Accept" means you agree to the current data
+                            storage standards as outlined in the
+                            <a class="text-blue-500 hover:underline" :href="route('privacy')" target="_blank">Privacy Policy</a>.
+                        </p>
                     </div>
                 </div>
                 <div class="w-full md:w-5/12 lg:w-1/3">
                     <div class="flex items-center space-x-3 md:justify-end">
                         <button
-                            class="bg-primary hover:bg-blue-dark inline-flex items-center justify-center rounded-md px-7 py-3 text-center text-base font-medium text-white cursor-pointer"
+                            class="bg-primary hover:bg-blue-dark inline-flex cursor-pointer items-center justify-center rounded-md px-7 py-3 text-center text-base font-medium text-white"
                             @click="accept"
                         >
                             Accept
                         </button>
                         <button
-                            class="text-body-color dark:text-dark-6 shadow-1 hover:bg-primary dark:bg-dark inline-flex items-center justify-center rounded-md bg-white px-7 py-3 text-center text-base font-medium hover:text-white dark:shadow-none cursor-pointer"
+                            class="text-body-color dark:text-dark-6 shadow-1 hover:bg-primary dark:bg-dark inline-flex cursor-pointer items-center justify-center rounded-md bg-white px-7 py-3 text-center text-base font-medium hover:text-white dark:shadow-none"
                             @click="close"
                         >
                             Close

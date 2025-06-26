@@ -14,10 +14,24 @@ Route::get('/', static function (Request $request) {
         return to_route('home');
     }
 
+    if ($request->get('cookie_consent')) {
+        Cookie::queue('cookie_consent', $request->get('cookie_consent'), 60 * 24 * 30);
+
+        return to_route('home');
+    }
+
     return Inertia::render('Welcome');
 })->name('home');
 
-Route::inertia('/repeating', 'Repeating')->name('repeating');
+Route::get('/repeating', static function (Request $request) {
+    $noCookieConsent = ! $request->cookie('cookieConsent');
+
+    if ($noCookieConsent) {
+        return to_route('home');
+    }
+
+    return Inertia::render('Repeating');
+})->name('repeating');
 
 Route::get('/payee/{payee}', static function (string $payee) {
     return Inertia::render('Payee', compact('payee'));

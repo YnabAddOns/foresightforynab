@@ -9,6 +9,7 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    cookieConsent: Boolean,
 });
 
 const selectedPlanName = computed(() => {
@@ -17,7 +18,7 @@ const selectedPlanName = computed(() => {
 </script>
 
 <template>
-    <CookieConsent />
+    <CookieConsent :cookie-consent="cookieConsent" />
     <div
         class="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a] dark:text-gray-300 dark:[color-scheme:dark]"
     >
@@ -28,7 +29,7 @@ const selectedPlanName = computed(() => {
                 </h1>
                 <div class="flex gap-x-4">
                     <Link class="hover:underline" :href="route('home')">Home</Link>
-                    <Link class="hover:underline" :href="route('repeating')">Repeating (Budget: {{ selectedPlanName }})</Link>
+                    <Link v-if="cookieConsent" class="hover:underline" :href="route('repeating')">Repeating (Budget: {{ selectedPlanName }})</Link>
                     <Link class="hover:underline" :href="route('about')">About</Link>
                     <Link class="hover:underline" :href="route('privacy')">Privacy</Link>
                 </div>

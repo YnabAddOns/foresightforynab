@@ -44,6 +44,7 @@ const props = defineProps({
     name: String,
     errors: Object,
     ziggy: Object,
+    cookieConsent: Boolean,
 });
 
 const ynabApi = ref(props.ynabAccessToken ? new ynab.API(props.ynabAccessToken) : null);
@@ -859,6 +860,8 @@ function exportCsv() {
     anchor.download = `transactions.csv`;
     anchor.click();
 }
+
+const consented = computed(() => props.cookieConsent);
 </script>
 
 <template>
@@ -867,272 +870,249 @@ function exportCsv() {
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     </Head>
 
-    <div v-if="supportsStorageOnBrowser" class="flex flex-col gap-y-5">
-        <div>
-            <h2 class="text-2xl font-bold">Controls</h2>
-        </div>
-
-        <div id="get-list-of-plans" class="flex flex-col gap-y-5">
-            <div class="flex gap-5">
-                <div>
-                    <div>
-                        <button
-                            class="me-2 mb-2 cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                            @click="getListOfPlans(true)"
-                        >
-                            Get List Of Plans
-                        </button>
-                    </div>
-
-                    <div>
-                        <div v-if="gettingListOfPlans">Getting list of plans...</div>
-                    </div>
-                </div>
-                <div>
-                    <button
-                        class="me-2 mb-2 cursor-pointer rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:ring-4 focus:ring-red-300 focus:outline-none dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                        @click="clearAllDataAndReload"
-                    >
-                        Clear All Data
-                    </button>
-                </div>
+    <div v-if="consented">
+        <div v-if="supportsStorageOnBrowser" class="flex flex-col gap-y-5">
+            <div>
+                <h2 class="text-2xl font-bold">Controls</h2>
             </div>
-        </div>
 
-        <div class="space-x-5 sm:flex">
-            <div id="plan-selection" class="ml-4 flex flex-col gap-y-5 sm:flex-1" v-if="Object.keys(listOfPlans).length">
-                <div>
-                    <h3 class="text-xl font-bold">Plan Selection</h3>
-                </div>
-
+            <div id="get-list-of-plans" class="flex flex-col gap-y-5">
                 <div class="flex gap-5">
-                    <div class="flex space-x-5">
-                        <label class="block text-sm font-medium text-gray-900 dark:text-white">Select Plan</label>
-                        <select
-                            v-model="selectedPlanKey"
-                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                        >
-                            <option :value="id" :key="id" v-for="(name, id) in listOfPlans">
-                                {{ name }}
-                            </option>
-                        </select>
-                    </div>
+                    <div>
+                        <div>
+                            <button
+                                class="me-2 mb-2 cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                @click="getListOfPlans(true)"
+                            >
+                                Get List Of Plans
+                            </button>
+                        </div>
 
+                        <div>
+                            <div v-if="gettingListOfPlans">Getting list of plans...</div>
+                        </div>
+                    </div>
                     <div>
                         <button
-                            class="me-2 mb-2 cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                            @click="getDataForPlan(true)"
+                            class="me-2 mb-2 cursor-pointer rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:ring-4 focus:ring-red-300 focus:outline-none dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                            @click="clearAllDataAndReload"
                         >
-                            Get Data For Plan
+                            Clear All Data
                         </button>
                     </div>
                 </div>
-
-                <div v-if="lastCallDate"><b>Last Call</b>: {{ lastCallDate?.toLocaleString(DateTime.DATETIME_SHORT) }}</div>
-
-                <div>
-                    <div v-if="gettingDataForPlan">Getting data... DO NOT REFRESH OR CLOSE THE TAB</div>
-                </div>
             </div>
 
-            <div id="filters" class="ml-4 flex flex-col gap-y-5 sm:flex-1">
-                <div>
-                    <h3 class="text-xl font-bold">Filters</h3>
-                </div>
-
-                <div class="flex gap-4">
-                    <div class="flex gap-2">
-                        <label for="flowType">Flow Type</label>
-                        <select name="flowType" id="flowType" v-model="flowType">
-                            <option value="all">All</option>
-                            <option value="outflow">Outflow</option>
-                            <option value="inflow">Inflow</option>
-                        </select>
+            <div class="space-x-5 sm:flex">
+                <div id="plan-selection" class="ml-4 flex flex-col gap-y-5 sm:flex-1" v-if="Object.keys(listOfPlans).length">
+                    <div>
+                        <h3 class="text-xl font-bold">Plan Selection</h3>
                     </div>
-                </div>
-                <div class="gap-2 md:flex">
-                    <div class="flex gap-2">
-                        <label for="start">Start</label>
-                        <input type="date" id="start" name="start" v-model="startDate" />
-                    </div>
-                    <div class="flex gap-2">
-                        <label for="end">End</label>
-                        <input type="date" id="end" name="end" v-model="endDate" />
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <label for="start">Include Transfers</label>
-                    <input type="checkbox" id="includeTransfers" name="includeTransfers" v-model="includeTransfers" />
-                </div>
-            </div>
-        </div>
 
-        <div class="flex space-x-5">
-            <div id="total" class="flex-1">
-                <div>
-                    <h2 class="text-2xl font-bold">Total</h2>
-                </div>
+                    <div class="flex gap-5">
+                        <div class="flex space-x-5">
+                            <label class="block text-sm font-medium text-gray-900 dark:text-white">Select Plan</label>
+                            <select
+                                v-model="selectedPlanKey"
+                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                            >
+                                <option :value="id" :key="id" v-for="(name, id) in listOfPlans">
+                                    {{ name }}
+                                </option>
+                            </select>
+                        </div>
 
-                <div class="ml-4 flex flex-col gap-y-5">
-                    <ul v-if="tableTransactions.length">
-                        <li>
-                            <b>Number of Transactions</b>: {{ tableTransactions.length }}
-                            transactions
-                        </li>
-                        <li v-if="flowTypeIsAll">
-                            <b>Total Amount</b>: {{ filteredTotalRevenue.toLocaleString() }} - {{ filteredTotalExpenses.toLocaleString() }} =
-                            {{ filteredNetAmount.toLocaleString() }}
-                        </li>
-                        <li v-else><b>Total Amount</b>: {{ filteredTotalAmount.toLocaleString() }}</li>
-                    </ul>
-
-                    <div class="text-gray-500" v-if="!tableTransactions.length">No transactions found.</div>
-                </div>
-            </div>
-
-            <div id="year-month" class="sm:flex-1">
-                <div>
-                    <h2 class="text-2xl font-bold">Year/Month</h2>
-                </div>
-
-                <div class="ml-4">
-                    <div v-if="tableTransactions.length">
-                        <div class="ml-4" :key="year.year" v-for="year in yearMonthAggregates">
-                            <div class="flex flex-row space-x-2">
-                                <div>
-                                    <b
-                                        >{{ year.year }} <span v-if="year.months.length === 0"> - {{ year.initialMonth }}</span></b
-                                    >:
-                                </div>
-                                <div>
-                                    <span
-                                        v-if="flowTypeIsAll"
-                                        :class="{ 'bg-red-100 dark:text-gray-500': year.net < 0, 'bg-green-100 dark:text-gray-500': year.net > 0 }"
-                                        >{{ year.revenue.toLocaleString() }} - {{ year.expense.toLocaleString() }} =
-                                        {{ year.net.toLocaleString() }}</span
-                                    >
-                                    <span v-else>{{ year.amount.toLocaleString() }}</span>
-                                    <span v-if="year.current">&nbsp;(Current Year)</span>
-                                </div>
-                                <div>
-                                    <button
-                                        class="cursor-pointer"
-                                        type="button"
-                                        v-if="isOpenYearAccordion(year.year)"
-                                        @click="setClosedYearAccordion(year.year)"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="size-6"
-                                        >
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                        </svg>
-                                    </button>
-                                    <button
-                                        class="cursor-pointer"
-                                        type="button"
-                                        v-if="isClosedYearAccordion(year.year)"
-                                        @click="setOpenYearAccordion(year.year)"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="size-6"
-                                        >
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div v-if="isOpenYearAccordion(year.year)">
-                                <div :key="month" v-for="month in year.months" class="ml-4">
-                                    <b>{{ month.name }}</b
-                                    >:
-                                    <span
-                                        :class="{ 'bg-red-300 dark:text-gray-600': month.net < 0, 'bg-green-300 dark:text-gray-600': month.net > 0 }"
-                                        v-if="flowTypeIsAll"
-                                        >{{ month.revenue.toLocaleString() }} - {{ month.expense.toLocaleString() }} =
-                                        {{ month.net.toLocaleString() }}</span
-                                    >
-                                    <span v-else>{{ month.amount.toLocaleString() }}</span>
-                                    <span v-if="month.current">&nbsp;(Current Month)</span>
-                                </div>
-                            </div>
+                        <div>
+                            <button
+                                class="me-2 mb-2 cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                @click="getDataForPlan(true)"
+                            >
+                                Get Data For Plan
+                            </button>
                         </div>
                     </div>
 
-                    <div class="text-gray-500" v-if="!tableTransactions.length">No transactions found.</div>
+                    <div v-if="lastCallDate"><b>Last Call</b>: {{ lastCallDate?.toLocaleString(DateTime.DATETIME_SHORT) }}</div>
+
+                    <div>
+                        <div v-if="gettingDataForPlan">Getting data... DO NOT REFRESH OR CLOSE THE TAB</div>
+                    </div>
+                </div>
+
+                <div id="filters" class="ml-4 flex flex-col gap-y-5 sm:flex-1">
+                    <div>
+                        <h3 class="text-xl font-bold">Filters</h3>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <div class="flex gap-2">
+                            <label for="flowType">Flow Type</label>
+                            <select name="flowType" id="flowType" v-model="flowType">
+                                <option value="all">All</option>
+                                <option value="outflow">Outflow</option>
+                                <option value="inflow">Inflow</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="gap-2 md:flex">
+                        <div class="flex gap-2">
+                            <label for="start">Start</label>
+                            <input type="date" id="start" name="start" v-model="startDate" />
+                        </div>
+                        <div class="flex gap-2">
+                            <label for="end">End</label>
+                            <input type="date" id="end" name="end" v-model="endDate" />
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <label for="start">Include Transfers</label>
+                        <input type="checkbox" id="includeTransfers" name="includeTransfers" v-model="includeTransfers" />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div>
-            <h2 class="text-2xl font-bold">Transactions</h2>
-        </div>
+            <div class="flex space-x-5">
+                <div id="total" class="flex-1">
+                    <div>
+                        <h2 class="text-2xl font-bold">Total</h2>
+                    </div>
 
-        <div class="text-end">
-            <button
-                @click="exportCsv"
-                type="button"
-                class="me-2 mb-2 cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-                Export
-            </button>
-        </div>
+                    <div class="ml-4 flex flex-col gap-y-5">
+                        <ul v-if="tableTransactions.length">
+                            <li>
+                                <b>Number of Transactions</b>: {{ tableTransactions.length }}
+                                transactions
+                            </li>
+                            <li v-if="flowTypeIsAll">
+                                <b>Total Amount</b>: {{ filteredTotalRevenue.toLocaleString() }} - {{ filteredTotalExpenses.toLocaleString() }} =
+                                {{ filteredNetAmount.toLocaleString() }}
+                            </li>
+                            <li v-else><b>Total Amount</b>: {{ filteredTotalAmount.toLocaleString() }}</li>
+                        </ul>
 
-        <div class="ml-4 max-h-96 overflow-y-auto" :key="tableTransactions.toLocaleString()">
-            <table v-if="tableTransactions.length" class="hidden sm:table md:w-full">
-                <thead class="sticky top-0 table-header-group bg-white dark:bg-black">
-                    <tr class="table-row">
-                        <th class="table-cell text-center">Date</th>
-                        <th class="table-cell text-center">Payee</th>
-                        <th class="table-cell text-center">Category</th>
-                        <th class="table-cell text-center">Amount</th>
-                        <th class="table-cell text-center">Parent Payee</th>
-                        <th class="table-cell text-center">Payee Is Recurring</th>
-                    </tr>
-                </thead>
-                <tbody class="table-row-group">
-                    <tr class="table-row" :key="transaction.id" v-for="transaction in tableTransactions">
-                        <td class="table-cell text-center" :class="{ 'text-yellow-600': dateIsFuture(transaction.date) }">
-                            {{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}
-                        </td>
-                        <td class="table-cell text-center">
-                            <a
-                                v-if="transaction?.payee && transaction?.id"
-                                class="text-blue-500 hover:underline"
-                                :href="
-                                    route('payee', {
-                                        payee: transaction.payee?.id,
-                                    })
-                                "
-                            >
-                                {{ transaction.payee?.name }}
-                            </a>
-                            <span v-else>N/A</span>
-                        </td>
-                        <td class="table-cell text-center">{{ transaction.category?.name ?? 'N/A' }}</td>
-                        <td
-                            class="table-cell text-center"
-                            :class="{ 'text-red-500': transaction.amount < 0, 'text-green-500': transaction.amount > 0 }"
-                        >
-                            {{ flowTypeIsAll ? transaction.amount : transaction.absolute_amount }}
-                        </td>
-                        <td class="table-cell text-center">{{ transaction.parent_transaction?.payee?.name ?? 'N/A' }}</td>
-                        <td class="table-cell text-center">{{ transaction.payee?.repeating_transaction ? 'Yes' : 'No' }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div v-if="tableTransactions.length">
-                <div class="my-4 sm:hidden" :key="transaction.id" v-for="transaction in tableTransactions">
-                    <div class="w-full border-2 p-4">
-                        <div class="flex">
-                            <div class="flex-1 truncate">
+                        <div class="text-gray-500" v-if="!tableTransactions.length">No transactions found.</div>
+                    </div>
+                </div>
+
+                <div id="year-month" class="sm:flex-1">
+                    <div>
+                        <h2 class="text-2xl font-bold">Year/Month</h2>
+                    </div>
+
+                    <div class="ml-4">
+                        <div v-if="tableTransactions.length">
+                            <div class="ml-4" :key="year.year" v-for="year in yearMonthAggregates">
+                                <div class="flex flex-row space-x-2">
+                                    <div>
+                                        <b
+                                            >{{ year.year }} <span v-if="year.months.length === 0"> - {{ year.initialMonth }}</span></b
+                                        >:
+                                    </div>
+                                    <div>
+                                        <span
+                                            v-if="flowTypeIsAll"
+                                            :class="{
+                                                'bg-red-100 dark:text-gray-500': year.net < 0,
+                                                'bg-green-100 dark:text-gray-500': year.net > 0,
+                                            }"
+                                            >{{ year.revenue.toLocaleString() }} - {{ year.expense.toLocaleString() }} =
+                                            {{ year.net.toLocaleString() }}</span
+                                        >
+                                        <span v-else>{{ year.amount.toLocaleString() }}</span>
+                                        <span v-if="year.current">&nbsp;(Current Year)</span>
+                                    </div>
+                                    <div>
+                                        <button
+                                            class="cursor-pointer"
+                                            type="button"
+                                            v-if="isOpenYearAccordion(year.year)"
+                                            @click="setClosedYearAccordion(year.year)"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="1.5"
+                                                stroke="currentColor"
+                                                class="size-6"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="cursor-pointer"
+                                            type="button"
+                                            v-if="isClosedYearAccordion(year.year)"
+                                            @click="setOpenYearAccordion(year.year)"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="1.5"
+                                                stroke="currentColor"
+                                                class="size-6"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div v-if="isOpenYearAccordion(year.year)">
+                                    <div :key="month" v-for="month in year.months" class="ml-4">
+                                        <b>{{ month.name }}</b
+                                        >:
+                                        <span
+                                            :class="{
+                                                'bg-red-300 dark:text-gray-600': month.net < 0,
+                                                'bg-green-300 dark:text-gray-600': month.net > 0,
+                                            }"
+                                            v-if="flowTypeIsAll"
+                                            >{{ month.revenue.toLocaleString() }} - {{ month.expense.toLocaleString() }} =
+                                            {{ month.net.toLocaleString() }}</span
+                                        >
+                                        <span v-else>{{ month.amount.toLocaleString() }}</span>
+                                        <span v-if="month.current">&nbsp;(Current Month)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-gray-500" v-if="!tableTransactions.length">No transactions found.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold">Transactions</h2>
+            </div>
+
+            <div class="text-end">
+                <button
+                    @click="exportCsv"
+                    type="button"
+                    class="me-2 mb-2 cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                    Export
+                </button>
+            </div>
+
+            <div class="ml-4 max-h-96 overflow-y-auto" :key="tableTransactions.toLocaleString()">
+                <table v-if="tableTransactions.length" class="hidden sm:table md:w-full">
+                    <thead class="sticky top-0 table-header-group bg-white dark:bg-black">
+                        <tr class="table-row">
+                            <th class="table-cell text-center">Date</th>
+                            <th class="table-cell text-center">Payee</th>
+                            <th class="table-cell text-center">Category</th>
+                            <th class="table-cell text-center">Amount</th>
+                            <th class="table-cell text-center">Parent Payee</th>
+                            <th class="table-cell text-center">Payee Is Recurring</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-row-group">
+                        <tr class="table-row" :key="transaction.id" v-for="transaction in tableTransactions">
+                            <td class="table-cell text-center" :class="{ 'text-yellow-600': dateIsFuture(transaction.date) }">
+                                {{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}
+                            </td>
+                            <td class="table-cell text-center">
                                 <a
                                     v-if="transaction?.payee && transaction?.id"
                                     class="text-blue-500 hover:underline"
@@ -1145,29 +1125,61 @@ function exportCsv() {
                                     {{ transaction.payee?.name }}
                                 </a>
                                 <span v-else>N/A</span>
-                            </div>
-                            <div
-                                class="flex-1 text-end"
+                            </td>
+                            <td class="table-cell text-center">{{ transaction.category?.name ?? 'N/A' }}</td>
+                            <td
+                                class="table-cell text-center"
                                 :class="{ 'text-red-500': transaction.amount < 0, 'text-green-500': transaction.amount > 0 }"
                             >
-                                {{ transaction.amount }}
+                                {{ flowTypeIsAll ? transaction.amount : transaction.absolute_amount }}
+                            </td>
+                            <td class="table-cell text-center">{{ transaction.parent_transaction?.payee?.name ?? 'N/A' }}</td>
+                            <td class="table-cell text-center">{{ transaction.payee?.repeating_transaction ? 'Yes' : 'No' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div v-if="tableTransactions.length">
+                    <div class="my-4 sm:hidden" :key="transaction.id" v-for="transaction in tableTransactions">
+                        <div class="w-full border-2 p-4">
+                            <div class="flex">
+                                <div class="flex-1 truncate">
+                                    <a
+                                        v-if="transaction?.payee && transaction?.id"
+                                        class="text-blue-500 hover:underline"
+                                        :href="
+                                            route('payee', {
+                                                payee: transaction.payee?.id,
+                                            })
+                                        "
+                                    >
+                                        {{ transaction.payee?.name }}
+                                    </a>
+                                    <span v-else>N/A</span>
+                                </div>
+                                <div
+                                    class="flex-1 text-end"
+                                    :class="{ 'text-red-500': transaction.amount < 0, 'text-green-500': transaction.amount > 0 }"
+                                >
+                                    {{ transaction.amount }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex text-gray-500">
-                            <div class="flex-1 truncate">{{ transaction.category?.name }}</div>
-                            <div class="flex-1 text-end">{{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}</div>
-                        </div>
-                        <div class="mt-4 flex flex-col text-end text-gray-500">
-                            <div class="flex-1">
-                                {{ transaction?.payee?.repeating_transaction?.frequency ?? 'No Frequency' }}
+                            <div class="flex text-gray-500">
+                                <div class="flex-1 truncate">{{ transaction.category?.name }}</div>
+                                <div class="flex-1 text-end">{{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}</div>
                             </div>
-                            <div class="flex-1">{{ transaction?.parent_transaction?.payee?.name ?? 'No Parent' }}</div>
+                            <div class="mt-4 flex flex-col text-end text-gray-500">
+                                <div class="flex-1">
+                                    {{ transaction?.payee?.repeating_transaction?.frequency ?? 'No Frequency' }}
+                                </div>
+                                <div class="flex-1">{{ transaction?.parent_transaction?.payee?.name ?? 'No Parent' }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="text-gray-500" v-if="!tableTransactions.length">No transactions found.</div>
             </div>
-            <div class="text-gray-500" v-if="!tableTransactions.length">No transactions found.</div>
         </div>
+        <div v-else>This browser does not support the current storage scheme. Please switch to a browser that does.</div>
     </div>
-    <div v-else>This browser does not support the current storage scheme. Please switch to a browser that does.</div>
+    <div class="text-center" v-else>Must consent to the above cookie policy to use the app.</div>
 </template>

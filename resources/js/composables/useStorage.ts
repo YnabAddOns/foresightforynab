@@ -165,13 +165,3 @@ export const repeating = {
         return localStorage.getItem('repeatingShowRelativeDates') === 'true';
     },
 };
-
-export const cookie = {
-    storeConsent: (consent: boolean) => {
-        localStorage.setItem('cookieConsent', JSON.stringify(consent));
-    },
-    getConsent: (): boolean => {
-        const consent = localStorage.getItem('cookieConsent');
-        return consent ? JSON.parse(consent) : false;
-    },
-};

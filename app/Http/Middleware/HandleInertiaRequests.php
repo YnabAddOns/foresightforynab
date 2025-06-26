@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 
@@ -45,6 +46,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'ynabAuthorizationUrl' => $this->getYnabAuthorizationUrl(),
             'ynabAccessToken' => $request->cookie('ynab_access_token'),
+            'cookieConsent' => (bool) Cookie::get('cookie_consent'),
         ];
     }
 
