@@ -40,5 +40,24 @@ const props = defineProps({
         </p>
 
         <p>I hope that this tool gives you a better level of control as well.</p>
+
+        <h2 class="text-2xl font-bold">Other Apps</h2>
+
+        <p>For viewing all apps that integrate with YNAB, see:</p>
+        <ul class="list-disc pl-5">
+            <li>
+                The YNAB API Docs:
+                <a href="https://api.ynab.com/#works-with-ynab-official" target="_blank" class="text-blue-500 hover:underline">Link</a>
+            </li>
+            <li>
+                Or My Notion Website, which has filtering and sorting options:
+                <a
+                    href="https://danielhaven-personal.notion.site/Integrates-With-YNAB-21e225ca9695803793d3c6081509fd20?pvs=143"
+                    target="_blank"
+                    class="text-blue-500 hover:underline"
+                    >Link</a
+                >
+            </li>
+        </ul>
     </div>
 </template>
