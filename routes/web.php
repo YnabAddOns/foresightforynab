@@ -24,3 +24,5 @@ Route::get('/payee/{payee}', static function (string $payee) {
 })->name('payee');
 
 Route::inertia('/privacy', 'Privacy')->name('privacy');
+
+Route::inertia('/about', 'About')->name('about');

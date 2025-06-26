@@ -931,7 +931,7 @@ function exportCsv() {
                 <div v-if="lastCallDate"><b>Last Call</b>: {{ lastCallDate?.toLocaleString(DateTime.DATETIME_SHORT) }}</div>
 
                 <div>
-                    <div v-if="gettingDataForPlan">Getting data... DO NOT EXIT REFRESH OR CLOSE THE TAB</div>
+                    <div v-if="gettingDataForPlan">Getting data... DO NOT REFRESH OR CLOSE THE TAB</div>
                 </div>
             </div>
 
@@ -1023,7 +1023,6 @@ function exportCsv() {
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
                                             viewBox="0 0 24 24"
                                             stroke-width="1.5"
                                             stroke="currentColor"
@@ -1040,7 +1039,6 @@ function exportCsv() {
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
                                             viewBox="0 0 24 24"
                                             stroke-width="1.5"
                                             stroke="currentColor"
