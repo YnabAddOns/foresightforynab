@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CookieConsent from '@/components/CookieConsent.vue';
 import { getPlan, getSelectedPlanKey } from '@/composables/useStorage';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -16,6 +17,7 @@ const selectedPlanName = computed(() => {
 </script>
 
 <template>
+    <CookieConsent />
     <div
         class="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a] dark:text-gray-300 dark:[color-scheme:dark]"
     >
@@ -38,7 +40,7 @@ const selectedPlanName = computed(() => {
             <a class="text-blue-500 hover:underline" href="mailto:feedback@foresightforynab.com">feedback@foresightforynab.com</a>. View the roadmap
             <a class="text-blue-500 hover:underline" target="_blank" href="https://github.com/orgs/YNAB-Add-Ons/projects/1/views/1">here</a>.
         </p>
-        <div class="justify-items-center mt-4">
+        <div class="mt-4 justify-items-center">
             <a href="https://ynab.com" target="_blank">
                 <img src="https://api.ynab.com/papi/works_with_ynab.svg" alt="Works With YNAB" />
             </a>

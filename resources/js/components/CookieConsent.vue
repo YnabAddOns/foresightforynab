@@ -1,0 +1,50 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import { cookie } from '@/composables/useStorage.js';
+
+const consented = ref(cookie.getConsent() ?? false);
+
+const notConsented = computed(() => !consented.value);
+
+function accept() {
+    consented.value = true;
+    cookie.storeConsent(true);
+}
+
+function close() {
+    consented.value = true;
+    cookie.storeConsent(false);
+}
+</script>
+
+<template>
+    <section v-if="notConsented" class="dark:bg-dark bg-white pt-20 pb-12 lg:pt-[120px] lg:pb-[90px]">
+        <div class="container mx-auto">
+            <div
+                class="bg-gray-2 dark:bg-dark-2 xs:px-10 border-stroke dark:border-dark-3 flex flex-wrap items-center justify-between rounded-lg border px-6 py-8 md:px-8 lg:px-10"
+            >
+                <div class="w-full md:w-7/12 lg:w-2/3">
+                    <div class="mb-6 md:mb-0">
+                        <p class="text-body-color dark:text-dark-6 text-base">We use cookies and local storage to ensure the site functions. Learn more <a class="text-blue-500 hover:underline" :href="route('privacy')" target="_blank">here</a>.</p>
+                    </div>
+                </div>
+                <div class="w-full md:w-5/12 lg:w-1/3">
+                    <div class="flex items-center space-x-3 md:justify-end">
+                        <button
+                            class="bg-primary hover:bg-blue-dark inline-flex items-center justify-center rounded-md px-7 py-3 text-center text-base font-medium text-white cursor-pointer"
+                            @click="accept"
+                        >
+                            Accept
+                        </button>
+                        <button
+                            class="text-body-color dark:text-dark-6 shadow-1 hover:bg-primary dark:bg-dark inline-flex items-center justify-center rounded-md bg-white px-7 py-3 text-center text-base font-medium hover:text-white dark:shadow-none cursor-pointer"
+                            @click="close"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</template>
