@@ -24,7 +24,7 @@ function close() {
     <section v-if="notConsented" class="bg-white pt-20 pb-12 lg:pt-[120px] lg:pb-[90px] dark:bg-black">
         <div class="container mx-auto">
             <div
-                class="bg-gray-2 xs:px-10 border-stroke dark:border-dark-3 flex flex-wrap items-center justify-between rounded-lg border px-6 py-8 md:px-8 lg:px-10 dark:bg-gray-700 bg-gray-300"
+                class="bg-gray-2 xs:px-10 border-stroke dark:border-dark-3 flex flex-wrap items-center justify-between rounded-lg border bg-gray-300 px-6 py-8 md:px-8 lg:px-10 dark:bg-gray-700"
             >
                 <div class="w-full md:w-7/12 lg:w-2/3">
                     <div class="mb-6 md:mb-0">
