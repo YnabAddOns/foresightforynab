@@ -690,7 +690,7 @@ const yearMonthAggregates = computed(() => {
             current: DateTime.now().year === i,
         });
 
-        for (let j = 0; j < 12; j++) {
+        for (let j = 0; j <= 12; j++) {
             const month = DateTime.local(i, j, 1);
 
             if (month >= start && month <= end) {

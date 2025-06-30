@@ -1,8 +1,16 @@
-import { clearAllData, storeEndDate, storePlan, storeSelectedPlanKey, storeStartDate } from '@/composables/useStorage';
+import {
+    clearAllData,
+    storeEndDate,
+    storeFlowType,
+    storePlan,
+    storeSelectedPlanKey,
+    storeStartDate
+} from '@/composables/useStorage';
 import { mount } from '@vue/test-utils';
 import { DateTime } from 'luxon';
 import * as fs from 'node:fs';
 import Welcome from '../pages/Welcome.vue';
+import { TransactionFactory } from '@/factories/factory';
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => {},
@@ -10,6 +18,8 @@ vi.mock('@inertiajs/vue3', () => ({
 
 beforeEach(() => {
     vi.useFakeTimers();
+    vi.clearAllTimers();
+    vi.clearAllMocks();
 });
 
 const singlePlanResponseContent = JSON.parse(fs.readFileSync(`${__dirname}/Fixtures/single-budget-response-content.json`, 'utf8'));
@@ -21,22 +31,24 @@ afterEach(() => {
 const ynabAuthorizationUrl: string =
     'https://app.ynab.com/oauth/authorize?client_id=client-id&redirect_uri=https%3A%2F%2Fhow-much-for-ynab.test&response_type=token';
 
-const component: any = mount(Welcome, {
-    props: {
-        ynabAuthorizationUrl,
-    },
-});
+function mountComponent(): any|{ vm: { ynabApi: any } } {
+    return mount(Welcome, {
+        props: {
+            ynabAuthorizationUrl,
+        },
+    });
+}
 
 describe('props', () => {
     test('ynabAccessToken', () => {
-        expect(component.props().ynabAccessToken).toBeNull();
+        expect(mountComponent().props().ynabAccessToken).toBeNull();
     });
 });
 
 describe('data', () => {
     describe('ynabApi', () => {
         test('ynabAccessToken is falsy', () => {
-            expect(component.vm.ynabApi).toBeNull();
+            expect(mountComponent().vm.ynabApi).toBeNull();
         });
 
         test('ynabAccessToken is truthy', () => {
@@ -55,7 +67,7 @@ describe('data', () => {
 describe('computed', () => {
     describe('categories', () => {
         test('missing', () => {
-            expect(component.vm.categories).toStrictEqual([]);
+            expect(mountComponent().vm.categories).toStrictEqual([]);
         });
 
         test('exists', () => {
@@ -81,7 +93,7 @@ describe('computed', () => {
 
     describe('payees', () => {
         test('missing', () => {
-            expect(component.vm.payees).toStrictEqual([]);
+            expect(mountComponent().vm.payees).toStrictEqual([]);
         });
 
         test('exists', () => {
@@ -110,7 +122,7 @@ describe('computed', () => {
 
     describe('filteredTotalAmount', () => {
         test('missing', () => {
-            expect(component.vm.filteredTotalAmount).toBe(0);
+            expect(mountComponent().vm.filteredTotalAmount).toBe(0);
         });
 
         test('exists', () => {
@@ -264,6 +276,8 @@ describe('computed', () => {
                 ],
             },
         ])('exists: flowType', ({ flowType, expected }) => {
+            vi.setSystemTime('2025-05-02');
+
             const transactions = [
                 {
                     date: '2025-05-09',
@@ -317,11 +331,160 @@ describe('computed', () => {
 
             expect(component.vm.yearMonthAggregates).toStrictEqual(expected);
         });
+
+        test('up to end of year', () => {
+            const transactions = [];
+
+            let date = DateTime.fromISO('2025-01-25');
+
+            for (let i = 1; i <= 12; i++) {
+
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                transactions.push(TransactionFactory.build({
+                    date: date.toISO(),
+                    amount: -100000,
+                    deleted: false,
+                }));
+
+                date = date.plus({ months: 1 });
+            }
+
+            const plan = { budget: { transactions, id: 'test' } };
+
+            storePlan(plan, 'test');
+
+            storeSelectedPlanKey('test');
+
+            storeStartDate('2025-01-01');
+
+            storeEndDate('2025-12-31');
+
+            storeFlowType('all');
+
+            const component: any = mount(Welcome, {
+                props: {
+                    ynabAuthorizationUrl,
+                },
+            });
+
+            expect(component.vm.yearMonthAggregates).toStrictEqual(
+                [
+                    {
+                        "year": 2025,
+                        "initialMonth": "January",
+                        "months": [
+                            {
+                                "name": "January",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "February",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "March",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "April",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "May",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "June",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": true
+                            },
+                            {
+                                "name": "July",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "August",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "September",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "October",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "November",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            },
+                            {
+                                "name": "December",
+                                "amount": 100,
+                                "revenue": 0,
+                                "expense": 100,
+                                "net": -100,
+                                "current": false
+                            }
+                        ],
+                        "amount": 1200,
+                        "revenue": 0,
+                        "expense": 1200,
+                        "net": -1200,
+                        "current": true
+                    }
+                ]
+            );
+        });
     });
 
     describe('tableTransactions', () => {
         test('missing', () => {
-            expect(component.vm.tableTransactions).toStrictEqual([]);
+            expect(mountComponent().vm.tableTransactions).toStrictEqual([]);
         });
 
         test('exists', () => {
