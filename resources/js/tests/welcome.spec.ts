@@ -333,6 +333,8 @@ describe('computed', () => {
         });
 
         test('up to end of year', () => {
+            vi.setSystemTime('2025-06-02');
+
             const transactions = [];
 
             let date = DateTime.fromISO('2025-01-25');

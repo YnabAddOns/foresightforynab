@@ -6,14 +6,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', static function (Request $request) {
-    $accessToken = $request->get('access_token');
-
-    if ($accessToken) {
-        Cookie::queue('ynab_access_token', $accessToken);
-
-        return to_route('home');
-    }
-
     if ($request->get('cookie_consent')) {
         Cookie::queue('cookie_consent', $request->get('cookie_consent'), 60 * 24 * 30);
 
@@ -22,6 +14,14 @@ Route::get('/', static function (Request $request) {
 
     return Inertia::render('Welcome');
 })->name('home');
+
+Route::post('/access-token', static function (Request $request) {
+    $accessToken = $request->get('access_token');
+
+    if ($accessToken) {
+        Cookie::queue('ynab_access_token', $accessToken, 60 * 24 * 30);
+    }
+})->name('access-token');
 
 Route::get('/repeating', static function (Request $request) {
     $noCookieConsent = ! Cookie::get('cookie_consent');

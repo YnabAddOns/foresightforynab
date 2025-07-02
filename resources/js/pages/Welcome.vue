@@ -24,7 +24,7 @@ import {
     storeStartDate,
     storeYearAccordions,
 } from '@/composables/useStorage';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { DateTime, Interval } from 'luxon';
 import { computed, ComputedRef, onMounted, ref, ToRef, watch } from 'vue';
 import * as ynab from 'ynab';
@@ -52,12 +52,18 @@ const ynabApi = ref(props.ynabAccessToken ? new ynab.API(props.ynabAccessToken) 
 onMounted(() => {
     const params = new URLSearchParams(window.location.hash.substring(1));
 
-    const access_token = params.get('access_token');
+    const access_token_url_param = params.get('access_token');
 
-    if (access_token) {
-        ynabApi.value = new ynab.API(access_token);
+    if (access_token_url_param) {
+        ynabApi.value = new ynab.API(access_token_url_param);
 
-        window.location.href = route('home', { access_token });
+        try {
+            router.post(route('access-token'), {
+                access_token: access_token_url_param,
+            });
+        } catch (e: any) {
+            console.error(e);
+        }
     }
 });
 
