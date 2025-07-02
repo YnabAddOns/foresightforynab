@@ -36,7 +36,7 @@ const selectedPlanName = computed(() => {
             </nav>
         </header>
         <p class="w-80 text-center italic">
-            This product is in <b>early alpha</b> and is currently managed by a solo developer with a full-time job doing something else. Please be
+            This product is in <b>early alpha</b> and is currently managed by a solo developer. Please be
             patient and send any and all feedback (feature requests, bugs, etc.) to
             <a class="text-blue-500 hover:underline" href="mailto:feedback@foresightforynab.com">feedback@foresightforynab.com</a>. View the roadmap
             <a class="text-blue-500 hover:underline" target="_blank" href="https://github.com/orgs/YNAB-Add-Ons/projects/1/views/1">here</a>.
