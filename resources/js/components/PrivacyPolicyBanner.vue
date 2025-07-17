@@ -20,7 +20,7 @@ const props = defineProps({
     },
 });
 
-const { showModal, shouldShowBanner, acknowledgeChanges, openModal, closeModal, handleModalAcknowledge } = usePrivacyPolicy(props.currentVersion);
+const { showModal, shouldShowBanner, openModal, closeModal, handleModalAcknowledge } = usePrivacyPolicy(props.currentVersion);
 
 const changeDateFormatted = computed(() => {
     return DateTime.fromISO(props.changeDate).toLocaleString(DateTime.DATE_MED);
