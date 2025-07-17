@@ -28,12 +28,12 @@ const changeDateFormatted = computed(() => {
 </script>
 
 <template>
-    <div v-if="shouldShowBanner" class="bg-background fixed top-16 right-0 left-0 z-40 border-b shadow-lg">
+    <div v-if="shouldShowBanner" class="bg-background top-16 right-0 left-0 z-40 border-b shadow-lg">
         <!-- Privacy Policy Update Banner -->
         <div class="container mx-auto px-4 py-4 sm:px-6 lg:px-8">
             <div class="flex flex-col items-center space-y-4 sm:flex-row sm:justify-between sm:space-y-0">
                 <!-- Content -->
-                <div class="flex items-start space-x-3">
+                <div class="flex items-center space-x-3">
                     <div class="flex-shrink-0">
                         <div class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
                             <svg class="h-4 w-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
@@ -45,11 +45,10 @@ const changeDateFormatted = computed(() => {
                             </svg>
                         </div>
                     </div>
-                    <div class="flex-1">
+                    <div>
                         <p class="text-muted-foreground text-sm">
                             <strong class="text-foreground">Privacy Policy Updated:</strong>
-                            Our privacy policy was updated on {{ changeDateFormatted }}. {{ changeDescription }}
-                            <a class="text-primary font-medium hover:underline" :href="route('privacy')">View the updated policy</a>.
+                            Our privacy policy was updated on {{ changeDateFormatted }}.
                         </p>
                     </div>
                 </div>
@@ -57,7 +56,6 @@ const changeDateFormatted = computed(() => {
                 <!-- Actions -->
                 <div class="flex space-x-2">
                     <Button @click="openModal" size="sm">View Details</Button>
-                    <Button variant="outline" @click="acknowledgeChanges" size="sm">Acknowledge</Button>
                 </div>
             </div>
         </div>

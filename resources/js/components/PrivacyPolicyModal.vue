@@ -5,6 +5,7 @@ import CardContent from '@/components/ui/CardContent.vue';
 import CardDescription from '@/components/ui/CardDescription.vue';
 import CardHeader from '@/components/ui/CardHeader.vue';
 import CardTitle from '@/components/ui/CardTitle.vue';
+import { DateTime } from 'luxon';
 import { computed } from 'vue';
 
 const props = defineProps({
@@ -29,11 +30,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'acknowledge']);
 
 const formattedDate = computed(() => {
-    return new Date(props.changeDate).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
+    return DateTime.fromISO(props.changeDate).toLocaleString(DateTime.DATE_MED);
 });
 
 function handleClose() {
@@ -51,7 +48,7 @@ function handleViewFullPolicy() {
 </script>
 
 <template>
-    <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div v-if="isOpen" class="fixed inset-0 z-100 flex items-center justify-center">
         <!-- Backdrop -->
         <div class="bg-background/80 absolute inset-0 backdrop-blur-sm" @click="handleClose"></div>
 
