@@ -3,7 +3,7 @@ import CookieConsent from '@/components/CookieConsent.vue';
 import PrivacyPolicyBanner from '@/components/PrivacyPolicyBanner.vue';
 import { getPlanFromBudgetsData, getSelectedPlanKey } from '@/composables/useStorage';
 import { Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     name: {
@@ -34,6 +34,17 @@ const selectedPlanKey = computed(() => {
 const selectedPlanName = computed(() => {
     return getPlanFromBudgetsData(selectedPlanKey.value)?.budget?.name ?? null;
 });
+
+// Mobile menu state
+const isMobileMenuOpen = ref(false);
+
+const toggleMobileMenu = () => {
+    isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+const closeMobileMenu = () => {
+    isMobileMenuOpen.value = false;
+};
 </script>
 
 <template>
@@ -50,7 +61,7 @@ const selectedPlanName = computed(() => {
                 <div class="flex h-16 items-center justify-between">
                     <!-- Logo -->
                     <div class="flex items-center space-x-4">
-                        <Link :href="route('home')" class="flex items-center space-x-2">
+                        <Link :href="route('home')" class="flex items-center space-x-2" @click="closeMobileMenu">
                             <div class="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
                                 <span class="text-primary-foreground text-sm font-bold">F</span>
                             </div>
@@ -58,7 +69,7 @@ const selectedPlanName = computed(() => {
                         </Link>
                     </div>
 
-                    <!-- Navigation -->
+                    <!-- Desktop Navigation -->
                     <nav class="hidden items-center space-x-6 md:flex">
                         <Link :href="route('home')" class="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
                             Home
@@ -79,11 +90,64 @@ const selectedPlanName = computed(() => {
                     </nav>
 
                     <!-- Mobile menu button -->
-                    <button class="text-muted-foreground hover:text-foreground hover:bg-accent rounded-md p-2 md:hidden">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    <button
+                        @click="toggleMobileMenu"
+                        class="text-muted-foreground hover:text-foreground hover:bg-accent rounded-md p-2 transition-colors md:hidden"
+                        :aria-expanded="isMobileMenuOpen"
+                        aria-label="Toggle mobile menu"
+                    >
+                        <svg
+                            class="h-6 w-6 transition-transform duration-200"
+                            :class="{ 'rotate-90': isMobileMenuOpen }"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                v-if="!isMobileMenuOpen"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
+                            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
+                </div>
+
+                <!-- Mobile Navigation Menu -->
+                <div v-show="isMobileMenuOpen" class="md:hidden">
+                    <div class="border-border space-y-2 border-t py-4">
+                        <Link
+                            :href="route('home')"
+                            class="text-muted-foreground hover:text-foreground hover:bg-accent block rounded-md px-2 py-2 text-sm font-medium transition-colors"
+                            @click="closeMobileMenu"
+                        >
+                            Home
+                        </Link>
+                        <Link
+                            v-if="selectedPlanName"
+                            :href="route('repeating')"
+                            class="text-muted-foreground hover:text-foreground hover:bg-accent block rounded-md px-2 py-2 text-sm font-medium transition-colors"
+                            @click="closeMobileMenu"
+                        >
+                            Repeating ({{ selectedPlanName }})
+                        </Link>
+                        <Link
+                            :href="route('about')"
+                            class="text-muted-foreground hover:text-foreground hover:bg-accent block rounded-md px-2 py-2 text-sm font-medium transition-colors"
+                            @click="closeMobileMenu"
+                        >
+                            About
+                        </Link>
+                        <Link
+                            :href="route('privacy')"
+                            class="text-muted-foreground hover:text-foreground hover:bg-accent block rounded-md px-2 py-2 text-sm font-medium transition-colors"
+                            @click="closeMobileMenu"
+                        >
+                            Privacy
+                        </Link>
+                    </div>
                 </div>
             </div>
         </header>
