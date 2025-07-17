@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CookieConsent from '@/components/CookieConsent.vue';
+import PrivacyPolicyBanner from '@/components/PrivacyPolicyBanner.vue';
 import { getPlanFromBudgetsData, getSelectedPlanKey } from '@/composables/useStorage';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -12,6 +13,18 @@ const props = defineProps({
     cookieConsent: Boolean,
     ynabReferralLink: String,
     supportEmail: String,
+    privacyPolicyVersion: {
+        type: String,
+        default: '',
+    },
+    privacyPolicyChangeDate: {
+        type: String,
+        default: '',
+    },
+    privacyPolicyChangeDescription: {
+        type: String,
+        default: '',
+    },
 });
 
 const selectedPlanKey = computed(() => {
@@ -25,6 +38,11 @@ const selectedPlanName = computed(() => {
 
 <template>
     <CookieConsent :cookie-consent="cookieConsent" />
+    <PrivacyPolicyBanner
+        :current-version="privacyPolicyVersion"
+        :change-date="privacyPolicyChangeDate"
+        :change-description="privacyPolicyChangeDescription"
+    />
     <div class="bg-background min-h-screen" :class="{ 'pb-20': !cookieConsent }">
         <!-- Header -->
         <header class="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">

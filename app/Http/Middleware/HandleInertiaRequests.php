@@ -49,6 +49,10 @@ class HandleInertiaRequests extends Middleware
             'cookieConsent' => (bool) Cookie::get('cookie_consent'),
             'ynabReferralLink' => config('services.ynab.referral_link'),
             'supportEmail' => config('app.support_email'),
+            'privacyPolicyVersion' => config('privacy.current_version'),
+            'privacyPolicyChangeDate' => config('privacy.last_change_date'),
+            'privacyPolicyChangeDescription' => config('privacy.change_description'),
+            'curatedIntegrationsLink' => config('services.ynab.curated_integrations_link'),
         ];
     }
 
