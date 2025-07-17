@@ -21,7 +21,7 @@ const selectedPlanName = computed(() => {
 
 <template>
     <CookieConsent :cookie-consent="cookieConsent" />
-    <div class="bg-background min-h-screen">
+    <div class="bg-background min-h-screen" :class="{ 'pb-20': !cookieConsent }">
         <!-- Header -->
         <header class="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
