@@ -39,5 +39,6 @@ return [
         'client_id' => env('YNAB_CLIENT_ID'),
         'redirect_uri' => env('YNAB_REDIRECT_URI'),
         'referral_link' => env('YNAB_REFERRAL_LINK', 'https://ynab.com'),
+        'curated_integrations_link' => env('CURATED_INTEGRATIONS_LINK'),
     ],
 ];

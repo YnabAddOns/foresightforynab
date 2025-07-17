@@ -14,6 +14,10 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    curatedIntegrationsLink: {
+        type: String,
+        required: false,
+    },
 });
 </script>
 
@@ -151,10 +155,10 @@ const props = defineProps({
                             </svg>
                         </a>
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-2" v-if="curatedIntegrationsLink">
                         <h4 class="font-medium">Curated Integration List</h4>
                         <a
-                            href="https://danielhaven-personal.notion.site/Integrates-With-YNAB-21e225ca9695803793d3c6081509fd20?pvs=143"
+                            href="https://danielhavenofficial.notion.site/Integrates-With-YNAB-21e225ca9695803793d3c6081509fd20?pvs=74"
                             target="_blank"
                             class="text-primary inline-flex items-center space-x-1 font-medium hover:underline"
                         >
