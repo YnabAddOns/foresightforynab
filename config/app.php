@@ -125,4 +125,5 @@ return [
 
     'support_email' => env('SUPPORT_EMAIL'),
 
+    'roadmap_url' => env('ROADMAP_URL'),
 ];

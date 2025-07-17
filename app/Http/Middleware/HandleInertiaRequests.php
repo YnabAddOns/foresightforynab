@@ -53,6 +53,7 @@ class HandleInertiaRequests extends Middleware
             'privacyPolicyChangeDate' => config('privacy.last_change_date'),
             'privacyPolicyChangeDescription' => config('privacy.change_description'),
             'curatedIntegrationsLink' => config('services.ynab.curated_integrations_link'),
+            'roadmapUrl' => config('app.roadmap_url'),
         ];
     }
 
