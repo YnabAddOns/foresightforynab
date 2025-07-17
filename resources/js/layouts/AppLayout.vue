@@ -11,6 +11,7 @@ const props = defineProps({
     },
     cookieConsent: Boolean,
     ynabReferralLink: String,
+    supportEmail: String,
 });
 
 const selectedPlanName = computed(() => {
@@ -83,12 +84,11 @@ const selectedPlanName = computed(() => {
                     <div class="flex-1">
                         <p class="text-sm text-muted-foreground">
                             This product is in <span class="font-semibold text-foreground">early alpha</span> and is
-                            currently managed by a solo developer. Please be
-                            patient and send any and all feedback (feature requests, bugs, etc.) to
-                            <a class="text-primary hover:underline font-medium"
-                                href="mailto:feedback@foresightforynab.com">
-                                feedback@foresightforynab.com
-                            </a>. View the roadmap
+                            currently managed by a solo developer. <span v-if="supportEmail">Please be
+                                patient and send any and all feedback (feature requests, bugs, etc.) to
+                                <a class="text-primary hover:underline font-medium" :href="`mailto:${supportEmail}`">
+                                    {{ supportEmail }}
+                                </a>.</span> View the roadmap
                             <a class="text-primary hover:underline font-medium" target="_blank"
                                 href="https://github.com/orgs/YnabAddOns/projects/1">
                                 here
