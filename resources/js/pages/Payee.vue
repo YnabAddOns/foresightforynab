@@ -123,6 +123,8 @@ interface TableTransaction {
     absolute_amount: number;
     frequency: string | null;
     parent_transaction: any;
+    subtransactions?: TableTransaction[];
+    is_parent?: boolean;
 }
 
 function isScheduledTransaction(obj: any): obj is ScheduledTransaction {
@@ -180,9 +182,26 @@ const tableTransactions: ComputedRef<TableTransaction[]> = computed(() => {
                 };
             }) ?? [];
 
+        // Filter transactions that either:
+        // 1. Have the payee directly associated with the transaction
+        // 2. Have subtransactions with the payee
         return (
             transactions.filter((transaction) => {
-                return !transaction?.deleted && transaction.payee_id === props.payee;
+                if (transaction?.deleted) {
+                    return false;
+                }
+                
+                // Check if the transaction itself has the payee
+                if (transaction.payee_id === props.payee) {
+                    return true;
+                }
+                
+                // Check if any subtransaction has the payee
+                const hasMatchingSubtransaction = transaction.subtransactions.some((subtransaction) => {
+                    return subtransaction.payee_id === props.payee;
+                });
+                
+                return hasMatchingSubtransaction;
             }) ?? []
         );
     };
@@ -197,13 +216,35 @@ const tableTransactions: ComputedRef<TableTransaction[]> = computed(() => {
         }) ?? [];
 
     mergedHistoricalAndFuture.forEach(function (transaction) {
-        if (transaction.subtransactions.length) {
-            transaction.subtransactions.forEach((subtransaction) => {
+        // Check if this transaction has the payee directly
+        const transactionHasPayee = transaction.payee_id === props.payee;
+        
+        // Get subtransactions that have the payee
+        const matchingSubtransactions = transaction.subtransactions.filter((subtransaction) => {
+            return subtransaction.payee_id === props.payee;
+        });
+        
+        if (transactionHasPayee) {
+            // If the transaction itself has the payee, create a parent transaction
+            const parentTransaction: TableTransaction = {
+                id: transaction.id,
+                date: transaction.date,
+                category: (transaction?.category as Category) ?? null,
+                amount: transaction.real_amount,
+                absolute_amount: transaction.real_absolute_amount,
+                frequency: isScheduledTransaction(transaction) ? transaction.frequency : null,
+                parent_transaction: null,
+                payee: transaction?.payee ?? null,
+                is_parent: true,
+                subtransactions: []
+            };
+            
+            // Add matching subtransactions as children
+            matchingSubtransactions.forEach((subtransaction) => {
                 const payee = payees.value.filter((payee: ynab.Payee) => payee.id === subtransaction.payee_id)[0];
-
                 const category = categories.value.filter((category: ynab.Category) => category.id === subtransaction.category_id)[0];
 
-                result.push({
+                parentTransaction.subtransactions!.push({
                     id: subtransaction.id,
                     date: transaction.date,
                     category: category ? category : (transaction.category as Category),
@@ -214,8 +255,11 @@ const tableTransactions: ComputedRef<TableTransaction[]> = computed(() => {
                     payee: payee ? payee : (transaction.payee as Payee),
                 });
             });
-        } else {
-            result.push({
+            
+            result.push(parentTransaction);
+        } else if (matchingSubtransactions.length > 0) {
+            // If only subtransactions have the payee, create a parent transaction with subtransactions
+            const parentTransaction: TableTransaction = {
                 id: transaction.id,
                 date: transaction.date,
                 category: (transaction?.category as Category) ?? null,
@@ -224,7 +268,28 @@ const tableTransactions: ComputedRef<TableTransaction[]> = computed(() => {
                 frequency: isScheduledTransaction(transaction) ? transaction.frequency : null,
                 parent_transaction: null,
                 payee: transaction?.payee ?? null,
+                is_parent: true,
+                subtransactions: []
+            };
+            
+            // Add matching subtransactions as children
+            matchingSubtransactions.forEach((subtransaction) => {
+                const payee = payees.value.filter((payee: ynab.Payee) => payee.id === subtransaction.payee_id)[0];
+                const category = categories.value.filter((category: ynab.Category) => category.id === subtransaction.category_id)[0];
+
+                parentTransaction.subtransactions!.push({
+                    id: subtransaction.id,
+                    date: transaction.date,
+                    category: category ? category : (transaction.category as Category),
+                    amount: subtransaction.real_amount,
+                    absolute_amount: subtransaction.real_absolute_amount,
+                    frequency: isScheduledTransaction(transaction) ? transaction.frequency : null,
+                    parent_transaction: transaction,
+                    payee: payee ? payee : (transaction.payee as Payee),
+                });
             });
+            
+            result.push(parentTransaction);
         }
     });
 
@@ -300,7 +365,7 @@ function transformDateToLocaleString(date: DateTime | null) {
             <CardHeader>
                 <CardTitle class="flex items-center gap-2">
                     <span>Transaction History</span>
-                    <Badge variant="outline">{{ tableTransactions.length }} transactions</Badge>
+                    <Badge variant="outline">{{ tableTransactions.length }} parent transactions</Badge>
                 </CardTitle>
                 <CardDescription>Complete history of transactions for this payee</CardDescription>
             </CardHeader>
@@ -316,35 +381,77 @@ function transformDateToLocaleString(date: DateTime | null) {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr 
-                                v-for="transaction in tableTransactions" 
-                                :key="transaction.id"
-                                class="border-b border-border hover:bg-muted/50 transition-colors"
-                            >
-                                <td class="p-3">{{ transaction.payee?.name ?? 'N/A' }}</td>
-                                <td class="p-3">
-                                    <div class="flex items-center gap-2">
-                                        <span>{{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}</span>
-                                        <Badge v-if="dateIsFuture(transaction.date)" variant="secondary" class="text-xs">
-                                            Future
+                            <template v-for="transaction in tableTransactions" :key="transaction.id">
+                                <!-- Parent Transaction Row -->
+                                <tr class="border-b border-border hover:bg-muted/50 transition-colors">
+                                    <td class="p-3">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-medium">{{ transaction.payee?.name ?? 'N/A' }}</span>
+                                            <Badge v-if="transaction.subtransactions?.length" variant="secondary" class="text-xs">
+                                                Parent
+                                            </Badge>
+                                        </div>
+                                    </td>
+                                    <td class="p-3">
+                                        <div class="flex items-center gap-2">
+                                            <span>{{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}</span>
+                                            <Badge v-if="dateIsFuture(transaction.date)" variant="secondary" class="text-xs">
+                                                Future
+                                            </Badge>
+                                        </div>
+                                    </td>
+                                    <td class="p-3">
+                                        <Badge v-if="transaction.category" variant="outline" class="text-xs">
+                                            {{ transaction.category.name }}
                                         </Badge>
-                                    </div>
-                                </td>
-                                <td class="p-3">
-                                    <Badge v-if="transaction.category" variant="outline" class="text-xs">
-                                        {{ transaction.category.name }}
-                                    </Badge>
-                                    <span v-else class="text-muted-foreground">N/A</span>
-                                </td>
-                                <td class="p-3 text-right">
-                                    <Badge 
-                                        :variant="transaction.amount < 0 ? 'destructive' : 'default'"
-                                        class="text-xs"
-                                    >
-                                        {{ transaction.amount.toFixed(2) }}
-                                    </Badge>
-                                </td>
-                            </tr>
+                                        <span v-else class="text-muted-foreground">N/A</span>
+                                    </td>
+                                    <td class="p-3 text-right">
+                                        <Badge 
+                                            :variant="transaction.amount < 0 ? 'destructive' : 'default'"
+                                            class="text-xs"
+                                        >
+                                            {{ transaction.amount.toFixed(2) }}
+                                        </Badge>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Subtransaction Rows -->
+                                <tr 
+                                    v-for="subtransaction in transaction.subtransactions" 
+                                    :key="subtransaction.id"
+                                    class="border-b border-border hover:bg-muted/30 transition-colors bg-muted/20"
+                                >
+                                    <td class="p-3 pl-8">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm">{{ subtransaction.payee?.name ?? 'N/A' }}</span>
+                                            <Badge variant="outline" class="text-xs">Sub</Badge>
+                                        </div>
+                                    </td>
+                                    <td class="p-3">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm">{{ transformDateToLocaleString(subtransaction.date) ?? 'N/A' }}</span>
+                                            <Badge v-if="dateIsFuture(subtransaction.date)" variant="secondary" class="text-xs">
+                                                Future
+                                            </Badge>
+                                        </div>
+                                    </td>
+                                    <td class="p-3">
+                                        <Badge v-if="subtransaction.category" variant="outline" class="text-xs">
+                                            {{ subtransaction.category.name }}
+                                        </Badge>
+                                        <span v-else class="text-muted-foreground text-sm">N/A</span>
+                                    </td>
+                                    <td class="p-3 text-right">
+                                        <Badge 
+                                            :variant="subtransaction.amount < 0 ? 'destructive' : 'default'"
+                                            class="text-xs"
+                                        >
+                                            {{ subtransaction.amount.toFixed(2) }}
+                                        </Badge>
+                                    </td>
+                                </tr>
+                            </template>
                         </tbody>
                     </table>
 
@@ -353,31 +460,76 @@ function transformDateToLocaleString(date: DateTime | null) {
                         <div 
                             v-for="transaction in tableTransactions" 
                             :key="transaction.id"
-                            class="p-4 border rounded-lg space-y-2"
+                            class="p-4 border rounded-lg space-y-3"
                         >
-                            <div class="flex justify-between items-start">
-                                <div class="space-y-1">
-                                    <div class="font-medium">{{ transaction.payee?.name ?? 'N/A' }}</div>
-                                    <div class="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <span>{{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}</span>
-                                        <Badge v-if="dateIsFuture(transaction.date)" variant="secondary" class="text-xs">
-                                            Future
+                            <!-- Parent Transaction Card -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-start">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-medium">{{ transaction.payee?.name ?? 'N/A' }}</span>
+                                            <Badge v-if="transaction.subtransactions?.length" variant="secondary" class="text-xs">
+                                                Parent
+                                            </Badge>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <span>{{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}</span>
+                                            <Badge v-if="dateIsFuture(transaction.date)" variant="secondary" class="text-xs">
+                                                Future
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                    <Badge 
+                                        :variant="transaction.amount < 0 ? 'destructive' : 'default'"
+                                        class="text-xs"
+                                    >
+                                        {{ transaction.amount.toFixed(2) }}
+                                    </Badge>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-muted-foreground">Category:</span>
+                                    <Badge v-if="transaction.category" variant="outline" class="text-xs">
+                                        {{ transaction.category.name }}
+                                    </Badge>
+                                    <span v-else class="text-sm text-muted-foreground">N/A</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Subtransaction Cards -->
+                            <div v-if="transaction.subtransactions?.length" class="space-y-2 pl-4 border-l-2 border-muted">
+                                <div 
+                                    v-for="subtransaction in transaction.subtransactions" 
+                                    :key="subtransaction.id"
+                                    class="p-3 bg-muted/30 rounded-md space-y-2"
+                                >
+                                    <div class="flex justify-between items-start">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm font-medium">{{ subtransaction.payee?.name ?? 'N/A' }}</span>
+                                                <Badge variant="outline" class="text-xs">Sub</Badge>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <span>{{ transformDateToLocaleString(subtransaction.date) ?? 'N/A' }}</span>
+                                                <Badge v-if="dateIsFuture(subtransaction.date)" variant="secondary" class="text-xs">
+                                                    Future
+                                                </Badge>
+                                            </div>
+                                        </div>
+                                        <Badge 
+                                            :variant="subtransaction.amount < 0 ? 'destructive' : 'default'"
+                                            class="text-xs"
+                                        >
+                                            {{ subtransaction.amount.toFixed(2) }}
                                         </Badge>
                                     </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-muted-foreground">Category:</span>
+                                        <Badge v-if="subtransaction.category" variant="outline" class="text-xs">
+                                            {{ subtransaction.category.name }}
+                                        </Badge>
+                                        <span v-else class="text-xs text-muted-foreground">N/A</span>
+                                    </div>
                                 </div>
-                                <Badge 
-                                    :variant="transaction.amount < 0 ? 'destructive' : 'default'"
-                                    class="text-xs"
-                                >
-                                    {{ transaction.amount.toFixed(2) }}
-                                </Badge>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm text-muted-foreground">Category:</span>
-                                <Badge v-if="transaction.category" variant="outline" class="text-xs">
-                                    {{ transaction.category.name }}
-                                </Badge>
-                                <span v-else class="text-sm text-muted-foreground">N/A</span>
                             </div>
                         </div>
                     </div>
