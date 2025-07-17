@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import Payee from '../pages/Payee.vue';
 
 vi.mock('@inertiajs/vue3', () => ({
-    Head: () => { },
+    Head: () => {},
 }));
 
 beforeEach(() => {
@@ -38,14 +38,10 @@ describe('tableTransactions computed property', () => {
                     id: 'budget-1',
                     payees: [
                         { id: payeeId, name: 'Test Payee', deleted: false },
-                        { id: 'payee-2', name: 'Other Payee', deleted: false }
+                        { id: 'payee-2', name: 'Other Payee', deleted: false },
                     ],
-                    categories: [
-                        { id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }
-                    ],
-                    category_groups: [
-                        { id: 'group-1', name: 'Test Group', deleted: false }
-                    ],
+                    categories: [{ id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }],
+                    category_groups: [{ id: 'group-1', name: 'Test Group', deleted: false }],
                     transactions: [
                         {
                             id: 'transaction-1',
@@ -53,7 +49,7 @@ describe('tableTransactions computed property', () => {
                             amount: -50000, // -50.00
                             payee_id: payeeId,
                             category_id: categoryId,
-                            deleted: false
+                            deleted: false,
                         },
                         {
                             id: 'transaction-2',
@@ -61,11 +57,11 @@ describe('tableTransactions computed property', () => {
                             amount: -30000, // -30.00
                             payee_id: 'payee-2',
                             category_id: categoryId,
-                            deleted: false
-                        }
+                            deleted: false,
+                        },
                     ],
-                    subtransactions: []
-                }
+                    subtransactions: [],
+                },
             };
 
             storePlan(testData, 'budget-1');
@@ -81,7 +77,7 @@ describe('tableTransactions computed property', () => {
                 payee: { id: payeeId, name: 'Test Payee' },
                 category: { id: categoryId, name: 'Test Category' },
                 is_parent: true,
-                subtransactions: []
+                subtransactions: [],
             });
         });
     });
@@ -96,14 +92,10 @@ describe('tableTransactions computed property', () => {
                     id: 'budget-1',
                     payees: [
                         { id: payeeId, name: 'Test Payee', deleted: false },
-                        { id: 'payee-2', name: 'Parent Payee', deleted: false }
+                        { id: 'payee-2', name: 'Parent Payee', deleted: false },
                     ],
-                    categories: [
-                        { id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }
-                    ],
-                    category_groups: [
-                        { id: 'group-1', name: 'Test Group', deleted: false }
-                    ],
+                    categories: [{ id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }],
+                    category_groups: [{ id: 'group-1', name: 'Test Group', deleted: false }],
                     transactions: [
                         {
                             id: 'transaction-1',
@@ -111,8 +103,8 @@ describe('tableTransactions computed property', () => {
                             amount: -100000, // -100.00 (total of subtransactions)
                             payee_id: 'payee-2', // Parent transaction has different payee
                             category_id: categoryId,
-                            deleted: false
-                        }
+                            deleted: false,
+                        },
                     ],
                     subtransactions: [
                         {
@@ -121,7 +113,7 @@ describe('tableTransactions computed property', () => {
                             amount: -60000, // -60.00
                             payee_id: payeeId, // This subtransaction has our payee
                             category_id: categoryId,
-                            deleted: false
+                            deleted: false,
                         },
                         {
                             id: 'subtransaction-2',
@@ -129,10 +121,10 @@ describe('tableTransactions computed property', () => {
                             amount: -40000, // -40.00
                             payee_id: 'payee-2', // This subtransaction has different payee
                             category_id: categoryId,
-                            deleted: false
-                        }
-                    ]
-                }
+                            deleted: false,
+                        },
+                    ],
+                },
             };
 
             storePlan(testData, 'budget-1');
@@ -171,14 +163,10 @@ describe('tableTransactions computed property', () => {
                     id: 'budget-1',
                     payees: [
                         { id: payeeId, name: 'Test Payee', deleted: false },
-                        { id: 'payee-2', name: 'Other Payee', deleted: false }
+                        { id: 'payee-2', name: 'Other Payee', deleted: false },
                     ],
-                    categories: [
-                        { id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }
-                    ],
-                    category_groups: [
-                        { id: 'group-1', name: 'Test Group', deleted: false }
-                    ],
+                    categories: [{ id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }],
+                    category_groups: [{ id: 'group-1', name: 'Test Group', deleted: false }],
                     transactions: [
                         {
                             id: 'transaction-1',
@@ -186,7 +174,7 @@ describe('tableTransactions computed property', () => {
                             amount: -50000, // -50.00
                             payee_id: payeeId, // Direct transaction with our payee
                             category_id: categoryId,
-                            deleted: false
+                            deleted: false,
                         },
                         {
                             id: 'transaction-2',
@@ -194,8 +182,8 @@ describe('tableTransactions computed property', () => {
                             amount: -80000, // -80.00 (total of subtransactions)
                             payee_id: 'payee-2', // Parent transaction has different payee
                             category_id: categoryId,
-                            deleted: false
-                        }
+                            deleted: false,
+                        },
                     ],
                     subtransactions: [
                         {
@@ -204,7 +192,7 @@ describe('tableTransactions computed property', () => {
                             amount: -60000, // -60.00
                             payee_id: payeeId, // This subtransaction has our payee
                             category_id: categoryId,
-                            deleted: false
+                            deleted: false,
                         },
                         {
                             id: 'subtransaction-2',
@@ -212,10 +200,10 @@ describe('tableTransactions computed property', () => {
                             amount: -20000, // -20.00
                             payee_id: 'payee-2', // This subtransaction has different payee
                             category_id: categoryId,
-                            deleted: false
-                        }
-                    ]
-                }
+                            deleted: false,
+                        },
+                    ],
+                },
             };
 
             storePlan(testData, 'budget-1');
@@ -257,15 +245,9 @@ describe('tableTransactions computed property', () => {
             const testData = {
                 budget: {
                     id: 'budget-1',
-                    payees: [
-                        { id: payeeId, name: 'Test Payee', deleted: false }
-                    ],
-                    categories: [
-                        { id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }
-                    ],
-                    category_groups: [
-                        { id: 'group-1', name: 'Test Group', deleted: false }
-                    ],
+                    payees: [{ id: payeeId, name: 'Test Payee', deleted: false }],
+                    categories: [{ id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }],
+                    category_groups: [{ id: 'group-1', name: 'Test Group', deleted: false }],
                     transactions: [
                         {
                             id: 'transaction-1',
@@ -273,7 +255,7 @@ describe('tableTransactions computed property', () => {
                             amount: -50000,
                             payee_id: payeeId,
                             category_id: categoryId,
-                            deleted: true // This transaction is deleted
+                            deleted: true, // This transaction is deleted
                         },
                         {
                             id: 'transaction-2',
@@ -281,8 +263,8 @@ describe('tableTransactions computed property', () => {
                             amount: -30000,
                             payee_id: payeeId,
                             category_id: categoryId,
-                            deleted: false
-                        }
+                            deleted: false,
+                        },
                     ],
                     subtransactions: [
                         {
@@ -291,10 +273,10 @@ describe('tableTransactions computed property', () => {
                             amount: -20000,
                             payee_id: payeeId,
                             category_id: categoryId,
-                            deleted: true // This subtransaction is deleted
-                        }
-                    ]
-                }
+                            deleted: true, // This subtransaction is deleted
+                        },
+                    ],
+                },
             };
 
             storePlan(testData, 'budget-1');
@@ -314,15 +296,9 @@ describe('tableTransactions computed property', () => {
             const testData = {
                 budget: {
                     id: 'budget-1',
-                    payees: [
-                        { id: 'payee-2', name: 'Other Payee', deleted: false }
-                    ],
-                    categories: [
-                        { id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }
-                    ],
-                    category_groups: [
-                        { id: 'group-1', name: 'Test Group', deleted: false }
-                    ],
+                    payees: [{ id: 'payee-2', name: 'Other Payee', deleted: false }],
+                    categories: [{ id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }],
+                    category_groups: [{ id: 'group-1', name: 'Test Group', deleted: false }],
                     transactions: [
                         {
                             id: 'transaction-1',
@@ -330,11 +306,11 @@ describe('tableTransactions computed property', () => {
                             amount: -50000,
                             payee_id: payeeId, // Payee not in payees array
                             category_id: categoryId,
-                            deleted: false
-                        }
+                            deleted: false,
+                        },
                     ],
-                    subtransactions: []
-                }
+                    subtransactions: [],
+                },
             };
 
             storePlan(testData, 'budget-1');
@@ -354,15 +330,9 @@ describe('tableTransactions computed property', () => {
             const testData = {
                 budget: {
                     id: 'budget-1',
-                    payees: [
-                        { id: payeeId, name: 'Test Payee', deleted: false }
-                    ],
-                    categories: [
-                        { id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }
-                    ],
-                    category_groups: [
-                        { id: 'group-1', name: 'Test Group', deleted: false }
-                    ],
+                    payees: [{ id: payeeId, name: 'Test Payee', deleted: false }],
+                    categories: [{ id: categoryId, name: 'Test Category', category_group_id: 'group-1', deleted: false }],
+                    category_groups: [{ id: 'group-1', name: 'Test Group', deleted: false }],
                     transactions: [
                         {
                             id: 'transaction-1',
@@ -370,7 +340,7 @@ describe('tableTransactions computed property', () => {
                             amount: -50000,
                             payee_id: payeeId,
                             category_id: categoryId,
-                            deleted: false
+                            deleted: false,
                         },
                         {
                             id: 'transaction-2',
@@ -378,11 +348,11 @@ describe('tableTransactions computed property', () => {
                             amount: -30000,
                             payee_id: payeeId,
                             category_id: categoryId,
-                            deleted: false
-                        }
+                            deleted: false,
+                        },
                     ],
-                    subtransactions: []
-                }
+                    subtransactions: [],
+                },
             };
 
             storePlan(testData, 'budget-1');
@@ -407,13 +377,13 @@ describe('selectedPayee computed property', () => {
                 id: 'budget-1',
                 payees: [
                     { id: payeeId, name: 'Test Payee', deleted: false },
-                    { id: 'payee-2', name: 'Other Payee', deleted: false }
+                    { id: 'payee-2', name: 'Other Payee', deleted: false },
                 ],
                 categories: [],
                 category_groups: [],
                 transactions: [],
-                subtransactions: []
-            }
+                subtransactions: [],
+            },
         };
 
         storePlan(testData, 'budget-1');
@@ -424,7 +394,7 @@ describe('selectedPayee computed property', () => {
 
         expect(selectedPayee).toMatchObject({
             id: payeeId,
-            name: 'Test Payee'
+            name: 'Test Payee',
         });
     });
 
@@ -434,14 +404,12 @@ describe('selectedPayee computed property', () => {
         const testData = {
             budget: {
                 id: 'budget-1',
-                payees: [
-                    { id: 'payee-1', name: 'Test Payee', deleted: false }
-                ],
+                payees: [{ id: 'payee-1', name: 'Test Payee', deleted: false }],
                 categories: [],
                 category_groups: [],
                 transactions: [],
-                subtransactions: []
-            }
+                subtransactions: [],
+            },
         };
 
         storePlan(testData, 'budget-1');
@@ -452,4 +420,4 @@ describe('selectedPayee computed property', () => {
 
         expect(selectedPayee).toBeUndefined();
     });
-}); 
+});
