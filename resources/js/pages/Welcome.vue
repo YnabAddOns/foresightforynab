@@ -587,7 +587,7 @@ const tableTransactions: ComputedRef<TableTransaction[]> = computed(() => {
                 result.push({
                     id: subtransaction.id,
                     date: transaction.date,
-                    payee: payee ? payee : transaction.payee,
+                    payee: payee || null, // Don't fall back to parent payee for subtransactions
                     category: category ? category : (transaction.category as Category),
                     amount: subtransaction.real_amount,
                     absolute_amount: subtransaction.real_absolute_amount,
@@ -1191,7 +1191,7 @@ function exportCsv() {
                                         >
                                             {{ transaction.payee?.name }}
                                         </a>
-                                        <span v-else class="text-muted-foreground">N/A</span>
+                                        <span v-else class="text-muted-foreground text-gray-400">N/A</span>
                                     </td>
                                     <td class="p-3">
                                         <span class="text-muted-foreground">{{ transaction.category?.name ?? 'N/A' }}</span>
@@ -1202,7 +1202,14 @@ function exportCsv() {
                                         </span>
                                     </td>
                                     <td class="p-3">
-                                        <span class="text-muted-foreground">{{ transaction.parent_transaction?.payee?.name ?? 'N/A' }}</span>
+                                        <a
+                                            v-if="transaction.parent_transaction?.payee && transaction.parent_transaction?.payee?.id"
+                                            class="text-primary font-medium hover:underline"
+                                            :href="route('payee', { payee: transaction.parent_transaction.payee.id })"
+                                        >
+                                            {{ transaction.parent_transaction.payee.name }}
+                                        </a>
+                                        <span v-else class="text-muted-foreground text-gray-400">N/A</span>
                                     </td>
                                     <td class="p-3 text-center">
                                         <Badge :variant="transaction.payee?.repeating_transaction ? 'default' : 'secondary'">
@@ -1241,7 +1248,7 @@ function exportCsv() {
                                     >
                                         {{ transaction.payee?.name }}
                                     </a>
-                                    <span v-else class="text-muted-foreground text-sm">N/A</span>
+                                    <span v-else class="text-muted-foreground text-sm text-gray-400">N/A</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-muted-foreground text-sm">Category</span>
@@ -1249,7 +1256,14 @@ function exportCsv() {
                                 </div>
                                 <div v-if="transaction.parent_transaction?.payee?.name" class="flex items-center justify-between">
                                     <span class="text-muted-foreground text-sm">Parent Payee</span>
-                                    <span class="text-sm">{{ transaction.parent_transaction?.payee?.name }}</span>
+                                    <a
+                                        v-if="transaction.parent_transaction?.payee?.id"
+                                        class="text-primary text-sm font-medium hover:underline"
+                                        :href="route('payee', { payee: transaction.parent_transaction.payee.id })"
+                                    >
+                                        {{ transaction.parent_transaction.payee.name }}
+                                    </a>
+                                    <span v-else class="text-sm">{{ transaction.parent_transaction.payee.name }}</span>
                                 </div>
                             </div>
                         </div>
