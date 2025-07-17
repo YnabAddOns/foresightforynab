@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import Badge from '@/components/ui/Badge.vue';
+import Card from '@/components/ui/Card.vue';
+import CardContent from '@/components/ui/CardContent.vue';
+import CardDescription from '@/components/ui/CardDescription.vue';
+import CardHeader from '@/components/ui/CardHeader.vue';
+import CardTitle from '@/components/ui/CardTitle.vue';
 import { ScheduledTransaction } from '@/composables/useInterface';
 import { checkForStorageCompatibility, getPlan, getSelectedPlanKey, PlanWithServerKnowledge } from '@/composables/useStorage';
 import { Head } from '@inertiajs/vue3';
@@ -245,51 +251,155 @@ function transformDateToLocaleString(date: DateTime | null) {
 </script>
 
 <template>
-    <Head title="Repeating">
+
+    <Head title="Payee Details">
         <link rel="preconnect" href="https://rsms.me/" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     </Head>
 
-    <div v-if="supportsStorageOnBrowser" class="flex flex-col gap-y-5">
-        <h1 class="text-3xl">{{ selectedPayee?.name }}</h1>
-        <div v-if="selectedPayee?.repeating_transaction">
-            <h2 class="text-2xl">Repeating</h2>
-            <ul class="list-disc pl-5">
-                <li><b>Frequency</b>: {{ selectedPayee?.repeating_transaction.frequency }}</li>
-                <li>
-                    <b>Next Date</b>:
-                    {{ transformDateToLocaleString(DateTime.fromISO(selectedPayee?.repeating_transaction.date_next)) }}
-                </li>
-            </ul>
-        </div>
-        <h2>History of Transactions</h2>
-        <div class="ml-4 max-h-96 overflow-y-auto">
-            <table v-if="tableTransactions.length" class="hidden sm:table md:w-full">
-                <thead class="sticky top-0 table-header-group bg-white dark:bg-black">
-                    <tr class="table-row">
-                        <th class="table-cell text-center">Payee</th>
-                        <th class="table-cell text-center">Date</th>
-                        <th class="table-cell text-center">Category</th>
-                        <th class="table-cell text-center">Amount</th>
-                    </tr>
-                </thead>
-                <tbody class="table-row-group">
-                    <tr class="table-row" :key="transaction.id" v-for="transaction in tableTransactions">
-                        <td class="table-cell text-center">{{ transaction.payee?.name ?? 'N/A' }}</td>
-                        <td class="table-cell text-center" :class="{ 'text-yellow-600': dateIsFuture(transaction.date) }">
-                            {{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}
-                        </td>
-                        <td class="table-cell text-center">{{ transaction.category?.name ?? 'N/A' }}</td>
-                        <td
-                            class="table-cell text-center"
-                            :class="{ 'text-red-500': transaction.amount < 0, 'text-green-500': transaction.amount > 0 }"
+    <div v-if="supportsStorageOnBrowser" class="flex flex-col gap-6">
+        <!-- Payee Header Card -->
+        <Card>
+            <CardHeader>
+                <CardTitle class="text-3xl">{{ selectedPayee?.name }}</CardTitle>
+                <CardDescription>Payee transaction details and history</CardDescription>
+            </CardHeader>
+        </Card>
+
+        <!-- Repeating Transaction Card -->
+        <Card v-if="selectedPayee?.repeating_transaction">
+            <CardHeader>
+                <CardTitle class="flex items-center gap-2">
+                    <span>Repeating Transaction</span>
+                    <Badge variant="default">Active</Badge>
+                </CardTitle>
+                <CardDescription>Details about the scheduled repeating transaction</CardDescription>
+            </CardHeader>
+            <CardContent class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-muted-foreground">Frequency</label>
+                        <div class="flex items-center gap-2">
+                            <Badge variant="secondary">{{ selectedPayee?.repeating_transaction.frequency }}</Badge>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-muted-foreground">Next Date</label>
+                        <div class="flex items-center gap-2">
+                            <Badge variant="outline">
+                                {{ transformDateToLocaleString(DateTime.fromISO(selectedPayee?.repeating_transaction.date_next)) }}
+                            </Badge>
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <!-- Transaction History Card -->
+        <Card>
+            <CardHeader>
+                <CardTitle class="flex items-center gap-2">
+                    <span>Transaction History</span>
+                    <Badge variant="outline">{{ tableTransactions.length }} transactions</Badge>
+                </CardTitle>
+                <CardDescription>Complete history of transactions for this payee</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div class="max-h-96 overflow-y-auto">
+                    <table v-if="tableTransactions.length" class="hidden sm:table w-full">
+                        <thead class="sticky top-0 bg-background border-b">
+                            <tr>
+                                <th class="text-left p-3 font-medium text-muted-foreground">Payee</th>
+                                <th class="text-left p-3 font-medium text-muted-foreground">Date</th>
+                                <th class="text-left p-3 font-medium text-muted-foreground">Category</th>
+                                <th class="text-right p-3 font-medium text-muted-foreground">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr 
+                                v-for="transaction in tableTransactions" 
+                                :key="transaction.id"
+                                class="border-b border-border hover:bg-muted/50 transition-colors"
+                            >
+                                <td class="p-3">{{ transaction.payee?.name ?? 'N/A' }}</td>
+                                <td class="p-3">
+                                    <div class="flex items-center gap-2">
+                                        <span>{{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}</span>
+                                        <Badge v-if="dateIsFuture(transaction.date)" variant="secondary" class="text-xs">
+                                            Future
+                                        </Badge>
+                                    </div>
+                                </td>
+                                <td class="p-3">
+                                    <Badge v-if="transaction.category" variant="outline" class="text-xs">
+                                        {{ transaction.category.name }}
+                                    </Badge>
+                                    <span v-else class="text-muted-foreground">N/A</span>
+                                </td>
+                                <td class="p-3 text-right">
+                                    <Badge 
+                                        :variant="transaction.amount < 0 ? 'destructive' : 'default'"
+                                        class="text-xs"
+                                    >
+                                        {{ transaction.amount.toFixed(2) }}
+                                    </Badge>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Mobile Cards -->
+                    <div v-if="tableTransactions.length" class="sm:hidden space-y-4">
+                        <div 
+                            v-for="transaction in tableTransactions" 
+                            :key="transaction.id"
+                            class="p-4 border rounded-lg space-y-2"
                         >
-                            {{ transaction.amount }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                            <div class="flex justify-between items-start">
+                                <div class="space-y-1">
+                                    <div class="font-medium">{{ transaction.payee?.name ?? 'N/A' }}</div>
+                                    <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <span>{{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}</span>
+                                        <Badge v-if="dateIsFuture(transaction.date)" variant="secondary" class="text-xs">
+                                            Future
+                                        </Badge>
+                                    </div>
+                                </div>
+                                <Badge 
+                                    :variant="transaction.amount < 0 ? 'destructive' : 'default'"
+                                    class="text-xs"
+                                >
+                                    {{ transaction.amount.toFixed(2) }}
+                                </Badge>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-muted-foreground">Category:</span>
+                                <Badge v-if="transaction.category" variant="outline" class="text-xs">
+                                    {{ transaction.category.name }}
+                                </Badge>
+                                <span v-else class="text-sm text-muted-foreground">N/A</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-else class="text-center py-8 text-muted-foreground">
+                        No transactions found for this payee.
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
     </div>
-    <div v-else>This browser does not support the current storage scheme. Please switch to a browser that does.</div>
+
+    <!-- Browser Compatibility Message -->
+    <Card v-else>
+        <CardHeader>
+            <CardTitle>Browser Compatibility Issue</CardTitle>
+            <CardDescription>Your browser does not support the required storage features</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <p class="text-muted-foreground">
+                This browser does not support the current storage scheme. Please switch to a browser that does.
+            </p>
+        </CardContent>
+    </Card>
 </template>
