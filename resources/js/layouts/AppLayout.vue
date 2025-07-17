@@ -20,50 +20,114 @@ const selectedPlanName = computed(() => {
 
 <template>
     <CookieConsent :cookie-consent="cookieConsent" />
-    <div
-        class="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a] dark:text-gray-300 dark:[color-scheme:dark]">
-        <header class="mb-6 w-full text-sm not-has-[nav]:hidden lg:max-w-4xl">
-            <nav class="flex items-center justify-between gap-4">
-                <h1 class="text-3xl font-bold">
-                    <Link :href="route('home')">{{ props.name }}</Link>
-                </h1>
-                <div class="flex gap-x-4">
-                    <Link class="hover:underline" :href="route('home')">Home</Link>
-                    <Link v-if="cookieConsent" class="hover:underline" :href="route('repeating')">Repeating (Budget: {{
-                        selectedPlanName }})</Link>
-                    <Link class="hover:underline" :href="route('about')">About</Link>
-                    <Link class="hover:underline" :href="route('privacy')">Privacy</Link>
+    <div class="min-h-screen bg-background">
+        <!-- Header -->
+        <header
+            class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center justify-between">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-4">
+                        <Link :href="route('home')" class="flex items-center space-x-2">
+                        <div class="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                            <span class="text-primary-foreground font-bold text-sm">F</span>
+                        </div>
+                        <span class="text-xl font-bold text-foreground">{{ props.name }}</span>
+                        </Link>
+                    </div>
+
+                    <!-- Navigation -->
+                    <nav class="hidden md:flex items-center space-x-6">
+                        <Link :href="route('home')"
+                            class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                        Home
+                        </Link>
+                        <Link v-if="cookieConsent" :href="route('repeating')"
+                            class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                        Repeating ({{ selectedPlanName }})
+                        </Link>
+                        <Link :href="route('about')"
+                            class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                        About
+                        </Link>
+                        <Link :href="route('privacy')"
+                            class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                        Privacy
+                        </Link>
+                    </nav>
+
+                    <!-- Mobile menu button -->
+                    <button
+                        class="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
                 </div>
-            </nav>
+            </div>
         </header>
-        <p class="w-200 text-center italic">
-            This product is in <b>early alpha</b> and is currently managed by a solo developer. Please be
-            patient and send any and all feedback (feature requests, bugs, etc.) to
-            <a class="text-blue-500 hover:underline"
-                href="mailto:feedback@foresightforynab.com">feedback@foresightforynab.com</a>. View the roadmap
-            <a class="text-blue-500 hover:underline" target="_blank"
-                href="https://github.com/orgs/YnabAddOns/projects/1">here</a>.
-        </p>
-        <div
-            class="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
-            <main class="ml-4 w-full flex-col-reverse overflow-hidden rounded-lg lg:max-w-5xl lg:flex-row">
-                <slot />
-            </main>
-        </div>
-        <div class="hidden h-14.5 lg:block"></div>
-    </div>
-    <footer class="p-4">
-        <div class="text-center">
-            Copyright &copy; {{ new Date().getFullYear() }}
-            <a target="_blank" class="text-blue-500 hover:underline" href="https://github.com/YnabAddOns">YNAB
-                Add-Ons</a>. All rights reserved.
-        </div>
-    </footer>
-    <div class="justify-items-center">
-        <div class="p-4">
-            <a :href="ynabReferralLink" target="_blank">
-                <img src="https://api.ynab.com/papi/works_with_ynab.svg" alt="Works With YNAB" />
-            </a>
-        </div>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Alpha Notice -->
+            <div class="mb-8 rounded-lg border bg-muted/50 p-4">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-muted-foreground">
+                            This product is in <span class="font-semibold text-foreground">early alpha</span> and is
+                            currently managed by a solo developer. Please be
+                            patient and send any and all feedback (feature requests, bugs, etc.) to
+                            <a class="text-primary hover:underline font-medium"
+                                href="mailto:feedback@foresightforynab.com">
+                                feedback@foresightforynab.com
+                            </a>. View the roadmap
+                            <a class="text-primary hover:underline font-medium" target="_blank"
+                                href="https://github.com/orgs/YnabAddOns/projects/1">
+                                here
+                            </a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <div class="flex w-full items-center justify-center">
+                <div class="w-full max-w-5xl">
+                    <slot />
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t bg-muted/50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="flex flex-col items-center space-y-4 md:flex-row md:justify-between md:space-y-0">
+                    <div class="text-center md:text-left">
+                        <p class="text-sm text-muted-foreground">
+                            Copyright &copy; {{ new Date().getFullYear() }}
+                            <a target="_blank" class="text-primary hover:underline font-medium"
+                                href="https://github.com/YnabAddOns">
+                                YNAB Add-Ons
+                            </a>. All rights reserved.
+                        </p>
+                    </div>
+
+                    <!-- YNAB Badge -->
+                    <div class="flex items-center space-x-4">
+                        <a :href="ynabReferralLink" target="_blank" class="transition-opacity hover:opacity-80">
+                            <img src="https://api.ynab.com/papi/works_with_ynab.svg" alt="Works With YNAB" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 </template>

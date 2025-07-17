@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import Button from '@/components/ui/Button.vue';
 
 const props = defineProps({
     cookieConsent: Boolean,
@@ -11,7 +12,6 @@ const notConsented = computed(() => !consented.value);
 
 function accept() {
     consented.value = true;
-
     window.location.href = route('home', { cookie_consent: true });
 }
 
@@ -21,37 +21,45 @@ function close() {
 </script>
 
 <template>
-    <section v-if="notConsented" class="bg-white pt-20 pb-12 lg:pt-[120px] lg:pb-[90px] dark:bg-black">
-        <div class="container mx-auto">
-            <div
-                class="bg-gray-2 xs:px-10 border-stroke dark:border-dark-3 flex flex-wrap items-center justify-between rounded-lg border bg-gray-300 px-6 py-8 md:px-8 lg:px-10 dark:bg-gray-700"
-            >
-                <div class="w-full md:w-7/12 lg:w-2/3">
-                    <div class="mb-6 md:mb-0">
-                        <p class="text-body-color dark:text-dark-6 text-base">
-                            We use cookies and local storage to ensure the site functions. Clicking "Accept" means you agree to the current data
-                            storage standards as outlined in the
-                            <a class="text-blue-500 hover:underline" :href="route('privacy')">Privacy Policy</a>.
-                        </p>
+    <div v-if="notConsented" class="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-background/80 backdrop-blur-sm" @click="close"></div>
+
+        <!-- Cookie Banner -->
+        <div class="relative w-full max-w-md rounded-lg border bg-card p-6 shadow-lg">
+            <div class="flex items-start space-x-4">
+                <!-- Icon -->
+                <div class="flex-shrink-0">
+                    <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clip-rule="evenodd" />
+                        </svg>
                     </div>
                 </div>
-                <div class="w-full md:w-5/12 lg:w-1/3">
-                    <div class="flex items-center space-x-3 md:justify-end">
-                        <button
-                            class="bg-primary inline-flex cursor-pointer items-center justify-center rounded-md px-7 py-3 text-center text-base font-medium text-white hover:bg-blue-500 dark:bg-black dark:hover:bg-blue-500"
-                            @click="accept"
-                        >
+
+                <!-- Content -->
+                <div class="flex-1 space-y-3">
+                    <h3 class="text-lg font-semibold">Cookie Consent</h3>
+                    <p class="text-sm text-muted-foreground">
+                        We use cookies and local storage to ensure the site functions. Clicking "Accept" means you agree
+                        to the current data
+                        storage standards as outlined in the
+                        <a class="text-primary hover:underline font-medium" :href="route('privacy')">Privacy Policy</a>.
+                    </p>
+
+                    <!-- Actions -->
+                    <div class="flex space-x-2 pt-2">
+                        <Button @click="accept" class="flex-1">
                             Accept
-                        </button>
-                        <button
-                            class="text-body-color dark:text-dark-6 shadow-1 inline-flex cursor-pointer items-center justify-center rounded-md bg-white px-7 py-3 text-center text-base font-medium hover:bg-blue-500 hover:text-white dark:bg-black dark:shadow-none dark:hover:bg-blue-500"
-                            @click="close"
-                        >
+                        </Button>
+                        <Button variant="outline" @click="close" class="flex-1">
                             Close
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 </template>

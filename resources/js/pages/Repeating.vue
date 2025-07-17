@@ -5,6 +5,15 @@ import { DateTime } from 'luxon';
 import { computed, ComputedRef, onMounted, ref, watch } from 'vue';
 import * as ynab from 'ynab';
 import Layout from '../layouts/AppLayout.vue';
+import Card from '@/components/ui/Card.vue';
+import CardHeader from '@/components/ui/CardHeader.vue';
+import CardContent from '@/components/ui/CardContent.vue';
+import CardTitle from '@/components/ui/CardTitle.vue';
+import CardDescription from '@/components/ui/CardDescription.vue';
+import Button from '@/components/ui/Button.vue';
+import Badge from '@/components/ui/Badge.vue';
+import Input from '@/components/ui/Input.vue';
+import Pagination from '@/components/ui/Pagination.vue';
 
 defineOptions({ layout: Layout });
 
@@ -226,6 +235,31 @@ const repeatingTransactions = computed(() => {
     );
 });
 
+// Pagination state
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+
+// Computed pagination values
+const paginatedTransactions = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return repeatingTransactions.value.slice(start, end);
+});
+
+const totalPages = computed(() => {
+    return Math.ceil(repeatingTransactions.value.length / itemsPerPage.value);
+});
+
+// Pagination handlers
+function handlePageChange(page: number) {
+    currentPage.value = page;
+}
+
+function handleItemsPerPageChange(newItemsPerPage: number) {
+    itemsPerPage.value = newItemsPerPage;
+    currentPage.value = 1; // Reset to first page when changing items per page
+}
+
 function translateAmountToMonthlyViaFrequency(amount: number, frequency: ynab.ScheduledTransactionFrequency) {
     switch (frequency) {
         case 'never':
@@ -379,145 +413,376 @@ function exportCsv() {
 </script>
 
 <template>
+
     <Head title="Repeating">
         <link rel="preconnect" href="https://rsms.me/" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     </Head>
 
-    <div v-if="supportsStorageOnBrowser" class="flex flex-col gap-y-5">
-        <div class="space-y-4">
-            <div>
-                Create or edit repeating transactions on
-                <a class="text-blue-500 hover:underline" :href="`https://app.ynab.com/${selectedPlanKey}/accounts`">YNAB</a>.
-            </div>
-            <div>
-                <b>IMPORTANT</b>:
-                <ul class="list-disc pl-5">
-                    <li>Make sure to use a <b>unique payee name</b> for your repeating transactions.</li>
-                    <li>
-                        For instance, if you:
-                        <ul class="list-disc pl-10">
-                            <li>Gave a one-time payment to YouTube for something like a film rental, and</li>
-                            <li>Also have YouTube Premium</li>
-                        </ul>
-                    </li>
-                    <li>
-                        You should name the recurring YouTube payment something like "YouTube Premium" to differentiate it from the other YouTube
-                        payment.
-                    </li>
-                </ul>
-            </div>
-            <div class="flex space-x-2">
-                <div>
-                    <label for="sort" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Sort By</label>
-                    <select
-                        v-model="selectedSort"
-                        id="sort"
-                        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                    >
-                        <option :value="key" :key="key" v-for="(name, key) in sortOptions">{{ name }}</option>
-                    </select>
-                </div>
-                <div class="self-end">
-                    <label for="sort_order" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"></label>
-                    <select
-                        v-model="sortOrder"
-                        id="sort"
-                        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                    >
-                        <option value="asc">Ascending</option>
-                        <option value="desc">Descending</option>
-                    </select>
-                </div>
-            </div>
-            <div class="ml-2">
-                <label class="inline-flex cursor-pointer items-center">
-                    <input v-model="showRelativeDates" type="checkbox" value="" class="peer sr-only" />
-                    <span
-                        class="peer relative h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-blue-600 peer-focus:ring-4 peer-focus:ring-blue-300 peer-focus:outline-none after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:bg-blue-600 dark:peer-focus:ring-blue-800"
-                    ></span>
-                    <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Show Relative Dates Since Last Payment</span>
-                </label>
-            </div>
-            <div class="ml-4">
-                <div class="text-end">
-                    <button
-                        @click="exportCsv"
-                        type="button"
-                        class="me-2 mb-2 cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    >
-                        Export
-                    </button>
-                </div>
-                <table v-if="repeatingTransactions.length" class="hidden sm:table md:w-full">
-                    <thead class="sticky top-0 table-header-group bg-white dark:bg-black">
-                        <tr class="table-row">
-                            <th class="table-cell text-center">Next Date</th>
-                            <th class="table-cell text-center">Payee</th>
-                            <th class="table-cell text-center">Category</th>
-                            <th class="table-cell text-center">Amount</th>
-                            <th class="table-cell text-center">Frequency</th>
-                            <th class="table-cell text-center">Subtransactions</th>
-                            <th class="table-cell text-center">Monthly Amount</th>
-                            <th class="table-cell text-center">Yearly Amount</th>
-                            <th class="table-cell text-center">Date Since Last Payment</th>
-                            <th class="table-cell text-center">Days Till Next Payment</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-row-group">
-                        <tr class="table-row" :key="transaction.id" v-for="transaction in repeatingTransactions">
-                            <td class="table-cell text-center">
-                                {{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}
-                            </td>
-                            <td class="table-cell text-center">
-                                <a
-                                    v-if="transaction?.payee && transaction?.payee?.id"
-                                    class="cursor-pointer text-blue-500 hover:underline"
-                                    :href="
-                                        route('payee', {
-                                            payee: transaction.payee.id,
-                                        })
-                                    "
-                                >
-                                    {{ transaction.payee?.name }}
-                                </a>
-                                <span v-else>N/A</span>
-                            </td>
-                            <td class="table-cell text-center">{{ transaction.category?.name ?? 'N/A' }}</td>
-                            <td
-                                class="table-cell text-center"
-                                :class="{ 'text-red-500': transaction.real_amount < 0, 'text-green-500': transaction.real_amount > 0 }"
-                            >
-                                {{ transaction.real_absolute_amount }}
-                            </td>
-                            <td class="table-cell text-center">{{ transaction.frequency }}</td>
-                            <td class="table-cell text-center">{{ transaction.subtransactions.length }}</td>
-                            <td
-                                class="table-cell text-center"
-                                :class="{ 'text-red-500': transaction.real_amount < 0, 'text-green-500': transaction.real_amount > 0 }"
-                            >
-                                {{ transaction.monthly_amount.toLocaleString() }}
-                            </td>
-                            <td
-                                class="table-cell text-center"
-                                :class="{ 'text-red-500': transaction.real_amount < 0, 'text-green-500': transaction.real_amount > 0 }"
-                            >
-                                {{ transaction.yearly_amount.toLocaleString() }}
-                            </td>
-                            <td class="table-cell text-center">
-                                {{
-                                    showRelativeDates
-                                        ? transaction.date_since_last_payment?.toRelative()
-                                        : transformDateToLocaleString(transaction.date_since_last_payment)
-                                }}
-                            </td>
-                            <td class="table-cell text-center">{{ transaction.days_till_next_payment }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="text-gray-500" v-else>No repeating transactions found.</div>
-            </div>
+    <div v-if="supportsStorageOnBrowser" class="space-y-8">
+        <!-- Header Section -->
+        <div class="text-center space-y-4">
+            <h1 class="text-4xl font-bold tracking-tight">Repeating Transactions</h1>
+            <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Manage and analyze your recurring income and expenses from YNAB
+            </p>
         </div>
+
+        <!-- Important Notice -->
+        <Card>
+            <CardHeader>
+                <CardTitle class="flex items-center space-x-2">
+                    <svg class="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span>Important Information</span>
+                </CardTitle>
+                <CardDescription>Best practices for managing repeating transactions</CardDescription>
+            </CardHeader>
+            <CardContent class="space-y-4">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0">
+                        <div class="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center">
+                            <svg class="h-3 w-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-muted-foreground">
+                            Create or edit repeating transactions on
+                            <a class="text-primary hover:underline font-medium"
+                                :href="`https://app.ynab.com/${selectedPlanKey}/accounts`" target="_blank">
+                                YNAB
+                            </a>.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                    <h4 class="font-semibold text-amber-800 dark:text-amber-200 mb-2">Unique Payee Names Required</h4>
+                    <p class="text-amber-700 dark:text-amber-300 text-sm mb-3">
+                        Make sure to use a <strong>unique payee name</strong> for your repeating transactions.
+                    </p>
+                    <div class="text-amber-700 dark:text-amber-300 text-sm space-y-2">
+                        <p><strong>Example:</strong> If you have both:</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>A one-time payment to YouTube for a film rental</li>
+                            <li>YouTube Premium subscription</li>
+                        </ul>
+                        <p>Name the recurring payment <strong>"YouTube Premium"</strong> to differentiate it from other
+                            YouTube payments.</p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <!-- Controls Section -->
+        <Card>
+            <CardHeader>
+                <CardTitle>Table Controls</CardTitle>
+                <CardDescription>Customize how your repeating transactions are displayed</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Sort By</label>
+                        <select v-model="selectedSort"
+                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                            <option :value="key" :key="key" v-for="(name, key) in sortOptions">{{ name }}</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Sort Order</label>
+                        <select v-model="sortOrder"
+                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                            <option value="asc">Ascending</option>
+                            <option value="desc">Descending</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Date Display</label>
+                        <div class="flex items-center space-x-2">
+                            <input v-model="showRelativeDates" type="checkbox" id="relativeDates"
+                                class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
+                            <label for="relativeDates" class="text-sm text-muted-foreground">Show relative dates</label>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Actions</label>
+                        <Button @click="exportCsv" variant="outline" class="w-full">
+                            <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Export CSV
+                        </Button>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <!-- Summary Stats -->
+        <div class="grid gap-6 md:grid-cols-3">
+            <Card>
+                <CardContent class="p-6">
+                    <div class="flex items-center space-x-2">
+                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                            <svg class="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-muted-foreground">Total Transactions</p>
+                            <p class="text-2xl font-bold">{{ repeatingTransactions.length }}</p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardContent class="p-6">
+                    <div class="flex items-center space-x-2">
+                        <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 15.586 6H12z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-muted-foreground">Total Monthly</p>
+                            <p class="text-2xl font-bold">
+                                ${{repeatingTransactions.reduce((sum, t) => sum + t.monthly_amount, 0).toLocaleString()
+                                }}
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardContent class="p-6">
+                    <div class="flex items-center space-x-2">
+                        <div class="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                            <svg class="h-4 w-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-muted-foreground">Total Yearly</p>
+                            <p class="text-2xl font-bold">
+                                ${{repeatingTransactions.reduce((sum, t) => sum + t.yearly_amount, 0).toLocaleString()
+                                }}
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
+        <!-- Transactions Table -->
+        <Card>
+            <CardHeader>
+                <CardTitle>Repeating Transactions</CardTitle>
+                <CardDescription>Detailed view of your scheduled recurring transactions</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div v-if="repeatingTransactions.length" class="space-y-4">
+                    <!-- Desktop Table -->
+                    <div class="hidden lg:block overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left p-3 font-medium">Next Date</th>
+                                    <th class="text-left p-3 font-medium">Payee</th>
+                                    <th class="text-left p-3 font-medium">Category</th>
+                                    <th class="text-right p-3 font-medium">Amount</th>
+                                    <th class="text-center p-3 font-medium">Frequency</th>
+                                    <th class="text-center p-3 font-medium">Subtransactions</th>
+                                    <th class="text-right p-3 font-medium">Monthly</th>
+                                    <th class="text-right p-3 font-medium">Yearly</th>
+                                    <th class="text-center p-3 font-medium">Last Payment</th>
+                                    <th class="text-center p-3 font-medium">Days Until</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="transaction in paginatedTransactions" :key="transaction.id"
+                                    class="border-b hover:bg-muted/50">
+                                    <td class="p-3">
+                                        <span
+                                            :class="{ 'text-amber-600 font-medium': transaction.days_till_next_payment < 7 }">
+                                            {{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td class="p-3">
+                                        <a v-if="transaction?.payee && transaction?.payee?.id"
+                                            class="text-primary hover:underline font-medium"
+                                            :href="route('payee', { payee: transaction.payee.id })">
+                                            {{ transaction.payee?.name }}
+                                        </a>
+                                        <span v-else class="text-muted-foreground">N/A</span>
+                                    </td>
+                                    <td class="p-3">
+                                        <span class="text-muted-foreground">{{ transaction.category?.name ?? 'N/A'
+                                            }}</span>
+                                    </td>
+                                    <td class="p-3 text-right">
+                                        <span :class="[
+                                            'font-medium',
+                                            transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600'
+                                        ]">
+                                            ${{ transaction.real_absolute_amount }}
+                                        </span>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <Badge variant="outline" class="text-xs">{{ transaction.frequency }}</Badge>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <Badge v-if="transaction.subtransactions.length > 0" variant="secondary"
+                                            class="text-xs">
+                                            {{ transaction.subtransactions.length }}
+                                        </Badge>
+                                        <span v-else class="text-muted-foreground">0</span>
+                                    </td>
+                                    <td class="p-3 text-right">
+                                        <span :class="[
+                                            'font-medium',
+                                            transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600'
+                                        ]">
+                                            ${{ transaction.monthly_amount.toLocaleString() }}
+                                        </span>
+                                    </td>
+                                    <td class="p-3 text-right">
+                                        <span :class="[
+                                            'font-medium',
+                                            transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600'
+                                        ]">
+                                            ${{ transaction.yearly_amount.toLocaleString() }}
+                                        </span>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <span class="text-sm text-muted-foreground">
+                                            {{
+                                                showRelativeDates
+                                                    ? transaction.date_since_last_payment?.toRelative()
+                                                    : transformDateToLocaleString(transaction.date_since_last_payment)
+                                            }}
+                                        </span>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <Badge
+                                            :variant="transaction.days_till_next_payment < 7 ? 'destructive' : 'secondary'"
+                                            class="text-xs">
+                                            {{ transaction.days_till_next_payment }} days
+                                        </Badge>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Mobile Cards -->
+                    <div class="lg:hidden space-y-3">
+                        <div v-for="transaction in paginatedTransactions" :key="transaction.id"
+                            class="border rounded-lg p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span
+                                        :class="{ 'text-amber-600 font-medium': transaction.days_till_next_payment < 7 }">
+                                        {{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}
+                                    </span>
+                                    <Badge
+                                        :variant="transaction.days_till_next_payment < 7 ? 'destructive' : 'secondary'"
+                                        class="text-xs">
+                                        {{ transaction.days_till_next_payment }} days
+                                    </Badge>
+                                </div>
+                                <span :class="[
+                                    'font-semibold',
+                                    transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600'
+                                ]">
+                                    ${{ transaction.real_absolute_amount }}
+                                </span>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">Payee</span>
+                                    <a v-if="transaction?.payee && transaction?.payee?.id"
+                                        class="text-primary hover:underline font-medium text-sm"
+                                        :href="route('payee', { payee: transaction.payee.id })">
+                                        {{ transaction.payee?.name }}
+                                    </a>
+                                    <span v-else class="text-muted-foreground text-sm">N/A</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">Category</span>
+                                    <span class="text-sm">{{ transaction.category?.name ?? 'N/A' }}</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">Frequency</span>
+                                    <Badge variant="outline" class="text-xs">{{ transaction.frequency }}</Badge>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">Monthly</span>
+                                    <span :class="[
+                                        'text-sm font-medium',
+                                        transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600'
+                                    ]">
+                                        ${{ transaction.monthly_amount.toLocaleString() }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">Yearly</span>
+                                    <span :class="[
+                                        'text-sm font-medium',
+                                        transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600'
+                                    ]">
+                                        ${{ transaction.yearly_amount.toLocaleString() }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">Last Payment</span>
+                                    <span class="text-sm text-muted-foreground">
+                                        {{
+                                            showRelativeDates
+                                                ? transaction.date_since_last_payment?.toRelative()
+                                                : transformDateToLocaleString(transaction.date_since_last_payment)
+                                        }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="border-t pt-4">
+                        <Pagination :current-page="currentPage" :total-pages="totalPages"
+                            :total-items="repeatingTransactions.length" :items-per-page="itemsPerPage"
+                            :on-page-change="handlePageChange" :on-items-per-page-change="handleItemsPerPageChange" />
+                    </div>
+                </div>
+                <div v-else class="text-center py-12">
+                    <div class="text-muted-foreground">No repeating transactions found</div>
+                </div>
+            </CardContent>
+        </Card>
     </div>
-    <div v-else>This browser does not support the current storage scheme. Please switch to a browser that does.</div>
+    <div v-else class="text-center py-12">
+        <div class="text-muted-foreground">This browser does not support the current storage scheme. Please switch to a
+            browser that does.</div>
+    </div>
 </template>
