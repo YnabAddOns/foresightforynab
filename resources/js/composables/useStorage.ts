@@ -13,27 +13,27 @@ export interface Plans {
 export function getPlans(): Plans {
     return JSON.parse(
         localStorage.getItem('budgetsData') ??
-            JSON.stringify({
-                budgets: [],
-                defaultBudget: {
-                    id: null,
-                    name: null,
-                    last_modified_on: null,
-                    first_month: null,
-                    last_month: null,
-                    date_format: { format: null },
-                    currency_format: {
-                        iso_code: null,
-                        example_format: null,
-                        decimal_digits: null,
-                        decimal_separator: null,
-                        symbol_first: null,
-                        group_separator: null,
-                        currency_symbol: null,
-                        display_symbol: null,
-                    },
+        JSON.stringify({
+            budgets: [],
+            defaultBudget: {
+                id: null,
+                name: null,
+                last_modified_on: null,
+                first_month: null,
+                last_month: null,
+                date_format: { format: null },
+                currency_format: {
+                    iso_code: null,
+                    example_format: null,
+                    decimal_digits: null,
+                    decimal_separator: null,
+                    symbol_first: null,
+                    group_separator: null,
+                    currency_symbol: null,
+                    display_symbol: null,
                 },
-            }),
+            },
+        }),
     );
 }
 
@@ -48,6 +48,20 @@ export interface PlanWithServerKnowledge {
 
 export function getPlan(key: string): PlanWithServerKnowledge {
     return JSON.parse(localStorage.getItem(`plan-${key}`) ?? JSON.stringify({}));
+}
+
+export function getPlanFromBudgetsData(key: string): PlanWithServerKnowledge | null {
+    const plans = getPlans();
+    const plan = plans.budgets.find((plan: any) => plan.id === key);
+
+    if (!plan) {
+        return null;
+    }
+
+    return {
+        budget: plan,
+        server_knowledge: 0,
+    };
 }
 
 export function storeStartDate(startDate: any) {
