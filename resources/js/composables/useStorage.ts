@@ -13,27 +13,27 @@ export interface Plans {
 export function getPlans(): Plans {
     return JSON.parse(
         localStorage.getItem('budgetsData') ??
-        JSON.stringify({
-            budgets: [],
-            defaultBudget: {
-                id: null,
-                name: null,
-                last_modified_on: null,
-                first_month: null,
-                last_month: null,
-                date_format: { format: null },
-                currency_format: {
-                    iso_code: null,
-                    example_format: null,
-                    decimal_digits: null,
-                    decimal_separator: null,
-                    symbol_first: null,
-                    group_separator: null,
-                    currency_symbol: null,
-                    display_symbol: null,
+            JSON.stringify({
+                budgets: [],
+                defaultBudget: {
+                    id: null,
+                    name: null,
+                    last_modified_on: null,
+                    first_month: null,
+                    last_month: null,
+                    date_format: { format: null },
+                    currency_format: {
+                        iso_code: null,
+                        example_format: null,
+                        decimal_digits: null,
+                        decimal_separator: null,
+                        symbol_first: null,
+                        group_separator: null,
+                        currency_symbol: null,
+                        display_symbol: null,
+                    },
                 },
-            },
-        }),
+            }),
     );
 }
 

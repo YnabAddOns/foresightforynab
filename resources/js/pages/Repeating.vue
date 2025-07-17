@@ -416,7 +416,6 @@ function exportCsv() {
 </script>
 
 <template>
-
     <Head title="Repeating">
         <link rel="preconnect" href="https://rsms.me/" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
@@ -426,8 +425,7 @@ function exportCsv() {
             <!-- Header Section -->
             <div class="space-y-4 text-center">
                 <h1 class="text-4xl font-bold tracking-tight">Repeating Transactions</h1>
-                <p class="text-muted-foreground mx-auto max-w-3xl text-xl">Manage and analyze your recurring income and
-                    expenses from YNAB</p>
+                <p class="text-muted-foreground mx-auto max-w-3xl text-xl">Manage and analyze your recurring income and expenses from YNAB</p>
             </div>
 
             <!-- Important Notice -->
@@ -435,9 +433,11 @@ function exportCsv() {
                 <CardHeader>
                     <CardTitle class="flex items-center space-x-2">
                         <svg class="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
+                            <path
+                                fill-rule="evenodd"
                                 d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                clip-rule="evenodd" />
+                                clip-rule="evenodd"
+                            />
                         </svg>
                         <span>Important Information</span>
                     </CardTitle>
@@ -448,26 +448,30 @@ function exportCsv() {
                         <div class="flex-shrink-0">
                             <div class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100">
                                 <svg class="h-3 w-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
+                                    <path
+                                        fill-rule="evenodd"
                                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                        clip-rule="evenodd" />
+                                        clip-rule="evenodd"
+                                    />
                                 </svg>
                             </div>
                         </div>
                         <div>
                             <p class="text-muted-foreground">
                                 Create or edit repeating transactions on
-                                <a class="text-primary font-medium hover:underline"
-                                    :href="`https://app.ynab.com/${selectedPlanKey}/accounts`" target="_blank">
-                                    YNAB </a>.
+                                <a
+                                    class="text-primary font-medium hover:underline"
+                                    :href="`https://app.ynab.com/${selectedPlanKey}/accounts`"
+                                    target="_blank"
+                                >
+                                    YNAB </a
+                                >.
                             </p>
                         </div>
                     </div>
 
-                    <div
-                        class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/20">
-                        <h4 class="mb-2 font-semibold text-amber-800 dark:text-amber-200">Unique Payee Names Required
-                        </h4>
+                    <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/20">
+                        <h4 class="mb-2 font-semibold text-amber-800 dark:text-amber-200">Unique Payee Names Required</h4>
                         <p class="mb-3 text-sm text-amber-700 dark:text-amber-300">
                             Make sure to use a <strong>unique payee name</strong> for your repeating transactions.
                         </p>
@@ -477,9 +481,7 @@ function exportCsv() {
                                 <li>A one-time payment to YouTube for a film rental</li>
                                 <li>YouTube Premium subscription</li>
                             </ul>
-                            <p>Name the recurring payment <strong>"YouTube Premium"</strong> to differentiate it from
-                                other
-                                YouTube payments.</p>
+                            <p>Name the recurring payment <strong>"YouTube Premium"</strong> to differentiate it from other YouTube payments.</p>
                         </div>
                     </div>
                 </CardContent>
@@ -495,16 +497,20 @@ function exportCsv() {
                     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                         <div class="space-y-2">
                             <label class="text-sm font-medium">Sort By</label>
-                            <select v-model="selectedSort"
-                                class="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50">
+                            <select
+                                v-model="selectedSort"
+                                class="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                            >
                                 <option :value="key" :key="key" v-for="(name, key) in sortOptions">{{ name }}</option>
                             </select>
                         </div>
 
                         <div class="space-y-2">
                             <label class="text-sm font-medium">Sort Order</label>
-                            <select v-model="sortOrder"
-                                class="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50">
+                            <select
+                                v-model="sortOrder"
+                                class="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                            >
                                 <option value="asc">Ascending</option>
                                 <option value="desc">Descending</option>
                             </select>
@@ -513,10 +519,13 @@ function exportCsv() {
                         <div class="space-y-2">
                             <label class="text-sm font-medium">Date Display</label>
                             <div class="flex items-center space-x-2">
-                                <input v-model="showRelativeDates" type="checkbox" id="relativeDates"
-                                    class="text-primary focus:ring-primary h-4 w-4 rounded border-gray-300" />
-                                <label for="relativeDates" class="text-muted-foreground text-sm">Show relative
-                                    dates</label>
+                                <input
+                                    v-model="showRelativeDates"
+                                    type="checkbox"
+                                    id="relativeDates"
+                                    class="text-primary focus:ring-primary h-4 w-4 rounded border-gray-300"
+                                />
+                                <label for="relativeDates" class="text-muted-foreground text-sm">Show relative dates</label>
                             </div>
                         </div>
 
@@ -524,8 +533,12 @@ function exportCsv() {
                             <label class="text-sm font-medium">Actions</label>
                             <Button @click="exportCsv" variant="outline" class="w-full">
                                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                    />
                                 </svg>
                                 Export CSV
                             </Button>
@@ -541,9 +554,11 @@ function exportCsv() {
                         <div class="flex items-center space-x-2">
                             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
                                 <svg class="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
+                                    <path
+                                        fill-rule="evenodd"
                                         d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                                        clip-rule="evenodd" />
+                                        clip-rule="evenodd"
+                                    />
                                 </svg>
                             </div>
                             <div>
@@ -559,17 +574,17 @@ function exportCsv() {
                         <div class="flex items-center space-x-2">
                             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
                                 <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
+                                    <path
+                                        fill-rule="evenodd"
                                         d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 15.586 6H12z"
-                                        clip-rule="evenodd" />
+                                        clip-rule="evenodd"
+                                    />
                                 </svg>
                             </div>
                             <div>
                                 <p class="text-muted-foreground text-sm">Total Monthly</p>
                                 <p class="text-2xl font-bold">
-                                    ${{repeatingTransactions.reduce((sum, t) => sum + t.monthly_amount,
-                                        0).toLocaleString()
-                                    }}
+                                    ${{ repeatingTransactions.reduce((sum, t) => sum + t.monthly_amount, 0).toLocaleString() }}
                                 </p>
                             </div>
                         </div>
@@ -581,17 +596,17 @@ function exportCsv() {
                         <div class="flex items-center space-x-2">
                             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
                                 <svg class="h-4 w-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
+                                    <path
+                                        fill-rule="evenodd"
                                         d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                        clip-rule="evenodd" />
+                                        clip-rule="evenodd"
+                                    />
                                 </svg>
                             </div>
                             <div>
                                 <p class="text-muted-foreground text-sm">Total Yearly</p>
                                 <p class="text-2xl font-bold">
-                                    ${{repeatingTransactions.reduce((sum, t) => sum + t.yearly_amount,
-                                        0).toLocaleString()
-                                    }}
+                                    ${{ repeatingTransactions.reduce((sum, t) => sum + t.yearly_amount, 0).toLocaleString() }}
                                 </p>
                             </div>
                         </div>
@@ -625,29 +640,27 @@ function exportCsv() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="transaction in paginatedTransactions" :key="transaction.id"
-                                        class="hover:bg-muted/50 border-b">
+                                    <tr v-for="transaction in paginatedTransactions" :key="transaction.id" class="hover:bg-muted/50 border-b">
                                         <td class="p-3">
-                                            <span
-                                                :class="{ 'font-medium text-amber-600': transaction.days_till_next_payment < 7 }">
+                                            <span :class="{ 'font-medium text-amber-600': transaction.days_till_next_payment < 7 }">
                                                 {{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}
                                             </span>
                                         </td>
                                         <td class="p-3">
-                                            <a v-if="transaction?.payee && transaction?.payee?.id"
+                                            <a
+                                                v-if="transaction?.payee && transaction?.payee?.id"
                                                 class="text-primary font-medium hover:underline"
-                                                :href="route('payee', { payee: transaction.payee.id })">
+                                                :href="route('payee', { payee: transaction.payee.id })"
+                                            >
                                                 {{ transaction.payee?.name }}
                                             </a>
                                             <span v-else class="text-muted-foreground">N/A</span>
                                         </td>
                                         <td class="p-3">
-                                            <span class="text-muted-foreground">{{ transaction.category?.name ?? 'N/A'
-                                            }}</span>
+                                            <span class="text-muted-foreground">{{ transaction.category?.name ?? 'N/A' }}</span>
                                         </td>
                                         <td class="p-3 text-right">
-                                            <span
-                                                :class="['font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
+                                            <span :class="['font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
                                                 ${{ transaction.real_absolute_amount }}
                                             </span>
                                         </td>
@@ -655,21 +668,18 @@ function exportCsv() {
                                             <Badge variant="outline" class="text-xs">{{ transaction.frequency }}</Badge>
                                         </td>
                                         <td class="p-3 text-center">
-                                            <Badge v-if="transaction.subtransactions.length > 0" variant="secondary"
-                                                class="text-xs">
+                                            <Badge v-if="transaction.subtransactions.length > 0" variant="secondary" class="text-xs">
                                                 {{ transaction.subtransactions.length }}
                                             </Badge>
                                             <span v-else class="text-muted-foreground">0</span>
                                         </td>
                                         <td class="p-3 text-right">
-                                            <span
-                                                :class="['font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
+                                            <span :class="['font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
                                                 ${{ transaction.monthly_amount.toLocaleString() }}
                                             </span>
                                         </td>
                                         <td class="p-3 text-right">
-                                            <span
-                                                :class="['font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
+                                            <span :class="['font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
                                                 ${{ transaction.yearly_amount.toLocaleString() }}
                                             </span>
                                         </td>
@@ -683,9 +693,7 @@ function exportCsv() {
                                             </span>
                                         </td>
                                         <td class="p-3 text-center">
-                                            <Badge
-                                                :variant="transaction.days_till_next_payment < 7 ? 'destructive' : 'secondary'"
-                                                class="text-xs">
+                                            <Badge :variant="transaction.days_till_next_payment < 7 ? 'destructive' : 'secondary'" class="text-xs">
                                                 {{ transaction.days_till_next_payment }} days
                                             </Badge>
                                         </td>
@@ -696,22 +704,17 @@ function exportCsv() {
 
                         <!-- Mobile Cards -->
                         <div class="space-y-3 lg:hidden">
-                            <div v-for="transaction in paginatedTransactions" :key="transaction.id"
-                                class="space-y-3 rounded-lg border p-4">
+                            <div v-for="transaction in paginatedTransactions" :key="transaction.id" class="space-y-3 rounded-lg border p-4">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-2">
-                                        <span
-                                            :class="{ 'font-medium text-amber-600': transaction.days_till_next_payment < 7 }">
+                                        <span :class="{ 'font-medium text-amber-600': transaction.days_till_next_payment < 7 }">
                                             {{ transformDateToLocaleString(transaction.date) ?? 'N/A' }}
                                         </span>
-                                        <Badge
-                                            :variant="transaction.days_till_next_payment < 7 ? 'destructive' : 'secondary'"
-                                            class="text-xs">
+                                        <Badge :variant="transaction.days_till_next_payment < 7 ? 'destructive' : 'secondary'" class="text-xs">
                                             {{ transaction.days_till_next_payment }} days
                                         </Badge>
                                     </div>
-                                    <span
-                                        :class="['font-semibold', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
+                                    <span :class="['font-semibold', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
                                         ${{ transaction.real_absolute_amount }}
                                     </span>
                                 </div>
@@ -719,9 +722,11 @@ function exportCsv() {
                                 <div class="space-y-2">
                                     <div class="flex items-center justify-between">
                                         <span class="text-muted-foreground text-sm">Payee</span>
-                                        <a v-if="transaction?.payee && transaction?.payee?.id"
+                                        <a
+                                            v-if="transaction?.payee && transaction?.payee?.id"
                                             class="text-primary text-sm font-medium hover:underline"
-                                            :href="route('payee', { payee: transaction.payee.id })">
+                                            :href="route('payee', { payee: transaction.payee.id })"
+                                        >
                                             {{ transaction.payee?.name }}
                                         </a>
                                         <span v-else class="text-muted-foreground text-sm">N/A</span>
@@ -736,15 +741,13 @@ function exportCsv() {
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <span class="text-muted-foreground text-sm">Monthly</span>
-                                        <span
-                                            :class="['text-sm font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
+                                        <span :class="['text-sm font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
                                             ${{ transaction.monthly_amount.toLocaleString() }}
                                         </span>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <span class="text-muted-foreground text-sm">Yearly</span>
-                                        <span
-                                            :class="['text-sm font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
+                                        <span :class="['text-sm font-medium', transaction.real_amount < 0 ? 'text-red-600' : 'text-green-600']">
                                             ${{ transaction.yearly_amount.toLocaleString() }}
                                         </span>
                                     </div>
@@ -764,10 +767,14 @@ function exportCsv() {
 
                         <!-- Pagination -->
                         <div class="border-t pt-4">
-                            <Pagination :current-page="currentPage" :total-pages="totalPages"
-                                :total-items="repeatingTransactions.length" :items-per-page="itemsPerPage"
+                            <Pagination
+                                :current-page="currentPage"
+                                :total-pages="totalPages"
+                                :total-items="repeatingTransactions.length"
+                                :items-per-page="itemsPerPage"
                                 :on-page-change="handlePageChange"
-                                :on-items-per-page-change="handleItemsPerPageChange" />
+                                :on-items-per-page-change="handleItemsPerPageChange"
+                            />
                         </div>
                     </div>
                     <div v-else class="py-12 text-center">
@@ -777,9 +784,7 @@ function exportCsv() {
             </Card>
         </div>
         <div v-else class="py-12 text-center">
-            <div class="text-muted-foreground">This browser does not support the current storage scheme. Please switch
-                to a
-                browser that does.</div>
+            <div class="text-muted-foreground">This browser does not support the current storage scheme. Please switch to a browser that does.</div>
         </div>
     </div>
     <div v-else>
