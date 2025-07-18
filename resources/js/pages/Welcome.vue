@@ -10,6 +10,7 @@ import Input from '@/components/ui/Input.vue';
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue';
 import Pagination from '@/components/ui/Pagination.vue';
 import { ScheduledTransaction } from '@/composables/useInterface';
+import { clearSampleData, injectSampleData, type SampleDataConfig } from '@/composables/useSampleData';
 import {
     checkForStorageCompatibility,
     clearAllData,
@@ -87,6 +88,50 @@ const supportsStorageOnBrowser = computed(() => {
     }
 
     return true;
+});
+
+// Sample data functions
+const sampleDataConfig = ref<SampleDataConfig>({
+    includeRepeatingTransactions: true,
+    includeNonRepeatingTransactions: true,
+    includeHistoricalTransactions: true,
+    includeSubtransactions: true,
+});
+
+function loadSampleData() {
+    injectSampleData(sampleDataConfig.value);
+    window.location.reload();
+}
+
+function switchToLiveData() {
+    clearSampleData();
+
+    // Try to restore the previous live budget selection
+    const budgetsData = localStorage.getItem('budgetsData');
+    if (budgetsData) {
+        try {
+            const parsed = JSON.parse(budgetsData);
+            if (parsed.budgets && parsed.budgets.length > 0) {
+                // If we have live budgets, select the first one or the default
+                const budgetToSelect = parsed.default_budget || parsed.budgets[0];
+                storeSelectedPlanKey(budgetToSelect.id);
+            }
+        } catch (e) {
+            // If parsing fails, clear the selection
+            storeSelectedPlanKey('');
+            console.error('Error parsing budgetsData:', e);
+        }
+    } else {
+        // No live data available, clear selection
+        storeSelectedPlanKey('');
+    }
+
+    window.location.reload();
+}
+
+// Check if we're currently using sample data
+const isUsingSampleData = computed(() => {
+    return getSelectedPlanKey() === 'sample-budget-id';
 });
 
 const gettingListOfPlans = ref(false);
@@ -949,6 +994,35 @@ function exportCsv() {
                                 Clear All Data
                             </Button>
                         </div>
+
+                        <div class="text-muted-foreground text-sm">
+                            <p v-if="!isUsingSampleData">
+                                💡 <strong>New to Foresight?</strong> Try the sample data to explore features without connecting your YNAB account.
+                            </p>
+                            <p v-if="isUsingSampleData">
+                                📊 <strong>Sample Data Active</strong> You're currently viewing sample data. Switch to live data to see your actual
+                                YNAB budget.
+                            </p>
+                        </div>
+
+                        <Button v-if="!isUsingSampleData" @click="loadSampleData" class="w-full md:w-auto">
+                            <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Use Sample Data
+                        </Button>
+
+                        <Button v-if="isUsingSampleData" @click="switchToLiveData" variant="outline" class="w-full md:w-auto">
+                            <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                                />
+                            </svg>
+                            Switch to Live Data
+                        </Button>
 
                         <div v-if="lastCallDate" class="text-muted-foreground text-sm">
                             <Badge variant="secondary">Last Call: {{ lastCallDate?.toLocaleString(DateTime.DATETIME_SHORT) }}</Badge>
