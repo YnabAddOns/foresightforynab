@@ -1023,10 +1023,6 @@ function exportCsv() {
                             </svg>
                             Switch to Live Data
                         </Button>
-
-                        <div v-if="lastCallDate" class="text-muted-foreground text-sm">
-                            <Badge variant="secondary">Last Call: {{ lastCallDate?.toLocaleString(DateTime.DATETIME_SHORT) }}</Badge>
-                        </div>
                     </div>
 
                     <!-- Plan Selection -->
@@ -1050,6 +1046,12 @@ function exportCsv() {
                                 </svg>
                                 {{ gettingDataForPlan ? 'Loading Data...' : 'Get Data For Plan' }}
                             </Button>
+
+                            <div v-if="lastCallDate" class="flex justify-end">
+                                <Badge variant="secondary" class="text-sm"
+                                    >Last Call: {{ lastCallDate?.toLocaleString(DateTime.DATETIME_SHORT) }}</Badge
+                                >
+                            </div>
                         </div>
 
                         <div v-if="gettingDataForPlan" class="flex items-center space-x-2 text-sm text-amber-600">
