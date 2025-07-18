@@ -1,5 +1,7 @@
 # Foresight for YNAB
 
+**⚠️ SUNSET NOTICE: This project has been sunset and the live website will be taken down. The code is now open source under the MIT license.**
+
 A web application that provides enhanced insights into your YNAB budget by analyzing future transactions and repeating patterns. Built with Laravel, Inertia.js, and Vue.js.
 
 ## Overview
@@ -11,6 +13,17 @@ Foresight for YNAB helps you better understand your financial future by:
 - Helping you make more informed budgeting decisions
 
 This application integrates with YNAB's API to access your budget data and provides additional analysis tools that complement YNAB's core functionality.
+
+## Sunset Information
+
+This project has been sunset and the live website will be taken down. However, the code is now open source under the MIT license, allowing you to:
+
+- Clone the repository and run it locally
+- Modify and extend the functionality
+- Deploy your own instance
+- Contribute improvements back to the community
+
+The application is fully functional and can be set up locally following the installation instructions below.
 
 ## Features
 
@@ -80,7 +93,6 @@ This application integrates with YNAB's API to access your budget data and provi
    YNAB_REDIRECT_URI=your_redirect_uri
    YNAB_REFERRAL_LINK=your_referral_link
    ```
-
 6. **Build assets**
    ```bash
    npm run build
@@ -193,6 +205,10 @@ npm run type-check       # Run TypeScript type checking
 - **Documentation**: Check the [docs](docs/) folder for detailed guides
 - **Issues**: Report bugs and feature requests via GitHub Issues
 - **Privacy**: See [Privacy Policy Updates](docs/PRIVACY_POLICY_UPDATES.md) for privacy-related information
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 

@@ -44,6 +44,20 @@
         @inertiaHead
     </head>
     <body class="font-sans antialiased">
-        @inertia
+        @if(config('app.sunset_banner_text'))
+            <!-- Sunset Banner -->
+            <div class="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white p-4 text-center shadow-lg">
+                <p class="text-sm font-medium">
+                    {!! config('app.sunset_banner_text') !!}
+                </p>
+            </div>
+            
+            <!-- Add top padding to account for the banner -->
+            <div class="pt-16">
+                @inertia
+            </div>
+        @else
+            @inertia
+        @endif
     </body>
 </html>

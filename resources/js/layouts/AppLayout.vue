@@ -158,35 +158,6 @@ const closeMobileMenu = () => {
 
         <!-- Main Content -->
         <main class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <!-- Alpha Notice -->
-            <div class="bg-muted/50 mb-8 rounded-lg border p-4">
-                <div class="flex items-start space-x-3">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                fill-rule="evenodd"
-                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                clip-rule="evenodd"
-                            />
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-muted-foreground text-sm">
-                            This product is in <span class="text-foreground font-semibold">early alpha</span> and is currently managed by a solo
-                            developer.
-                            <span v-if="supportEmail"
-                                >Please be patient and send any and all feedback (feature requests, bugs, etc.) to
-                                <a class="text-primary font-medium hover:underline" :href="`mailto:${supportEmail}`"> {{ supportEmail }} </a>.</span
-                            >
-                            <span v-if="roadmapUrl">
-                                View the roadmap
-                                <a class="text-primary font-medium hover:underline" target="_blank" :href="roadmapUrl"> here </a>.
-                            </span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Page Content -->
             <div class="flex w-full items-center justify-center">
                 <div class="w-full max-w-5xl">

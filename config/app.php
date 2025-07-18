@@ -126,4 +126,6 @@ return [
     'support_email' => env('SUPPORT_EMAIL'),
 
     'roadmap_url' => env('ROADMAP_URL'),
+
+    'sunset_banner_text' => env('SUNSET_BANNER_TEXT'),
 ];
